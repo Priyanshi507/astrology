@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\ChartRendering;
 
 /**
  * AstroChartRenderer — North Indian Chart (BPHS) v12

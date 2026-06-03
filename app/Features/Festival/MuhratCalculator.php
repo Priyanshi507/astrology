@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\Festival;
+
+use App\Features\Planetary\AstroCalculator;
 
 /**
  * MuhratCalculator — पूर्ण वैदिक मुहूर्त शास्त्र

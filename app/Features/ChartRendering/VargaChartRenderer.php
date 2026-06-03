@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\ChartRendering;
 
 /**
  * VargaChartRenderer — Redesigned with light/warm theme, house-based layout,

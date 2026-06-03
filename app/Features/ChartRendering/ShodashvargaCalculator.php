@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\ChartRendering;
 
 /**
  * ShodashvargaCalculator — Complete 16 Divisional Charts (Shodashvarga)

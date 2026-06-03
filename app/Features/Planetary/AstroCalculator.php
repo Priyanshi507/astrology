@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\Planetary;
 
 /**
  * AstroCalculator — PHP port of astro.js

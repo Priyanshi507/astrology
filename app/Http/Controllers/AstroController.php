@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\AstroCalculator;
-use App\Services\AstroChartRenderer;
-use App\Services\ShodashvargaCalculator;
-use App\Services\VargaChartRenderer;
-use App\Services\ShadBalaCalculator;
-use App\Services\VimshottariDashaCalculator;
-use App\Services\HinduFestivalCalculator;
-use App\Services\TodayPanelService;
-use App\Services\MuhratCalculator;
+use App\Features\Planetary\AstroCalculator;
+use App\Features\ChartRendering\AstroChartRenderer;
+use App\Features\ChartRendering\ShodashvargaCalculator;
+use App\Features\ChartRendering\VargaChartRenderer;
+use App\Features\Planetary\ShadBalaCalculator;
+use App\Features\Dasha\VimshottariDashaCalculator;
+use App\Features\Festival\HinduFestivalCalculator;
+use App\Features\Festival\TodayPanelService;
+use App\Features\Festival\MuhratCalculator;
+use App\Features\Festival\TarabalMurtiService;
 
 class AstroController extends Controller
 {
@@ -175,6 +176,52 @@ $dashaHtml = VimshottariDashaCalculator::renderHtml($vimshottari);
             'dashaHtml'    => $dashaHtml,
         ]);
     }
+
+    public function tarabalMurti(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = $request->validate([
+            'yr'         => 'required|integer|min:1900|max:2100',
+            'mo'         => 'required|integer|min:1|max:12',
+            'dy'         => 'required|integer|min:1|max:31',
+            'lat'        => 'required|numeric',
+            'lon'        => 'required|numeric',
+            'utcOff'     => 'required|numeric',
+            'birthNak'   => 'nullable|integer|min:-1|max:26',
+            'birthRashi' => 'nullable|integer|min:-1|max:11',
+        ]);
+ 
+        $yr         = (int)$v['yr'];
+        $mo         = (int)$v['mo'];
+        $dy         = (int)$v['dy'];
+        $lat        = (float)$v['lat'];
+        $lon        = (float)$v['lon'];
+        $utcOff     = (float)$v['utcOff'];
+        $birthNak   = (int)($v['birthNak']   ?? -1);
+        $birthRashi = (int)($v['birthRashi'] ?? -1);
+ 
+        // Compute Tarabal (includes full day data + tara result)
+        $taraData = TarabalMurtiService::computeTarabal(
+            $yr, $mo, $dy, $lat, $lon, $utcOff, $birthNak
+        );
+ 
+        // Merge Murti Nirnaya data
+        $murtiData = TarabalMurtiService::computeMurtiNirnaya(
+            $yr, $mo, $dy, $lat, $lon, $utcOff, $birthNak, $birthRashi
+        );
+ 
+        // Combined response
+        $response = array_merge($taraData, [
+            'murtiFormula'    => $murtiData['murtiFormula'],
+            'murtiForAllVara' => $murtiData['murtiForAllVara'],
+            'nakMuhurtaType'  => $murtiData['nakMuhurtaIdx'],
+            'nakMuhurtaInfo'  => $murtiData['nakMuhurtaType'],
+            'chandrabala'     => $murtiData['chandrabala'],
+        ]);
+ 
+        return response()->json($response);
+    }
+
+ 
 
    public function muhrat(Request $request)
     {

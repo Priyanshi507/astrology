@@ -12,9 +12,10 @@ Route::prefix('astro')->group(function () {
     Route::get('/city',       [AstroController::class, 'city'])->name('astro.city');
     Route::post('/festivals', [AstroController::class, 'festivals'])->name('astro.festivals');
     Route::post('/today',     [AstroController::class, 'today'])->name('astro.today');
-    Route::post('/muhrat',        [AstroController::class, 'muhrat'])->name('astro.muhrat');
-    Route::post('/muhrat/month',  [AstroController::class, 'muhratMonth'])->name('astro.muhrat.month');
-    Route::post('/muhrat/year',   [AstroController::class, 'muhratYear'])->name('astro.muhrat.year');
+    Route::post('/muhrat',       [AstroController::class, 'muhrat'])->name('astro.muhrat');
+    Route::post('/muhrat/month', [AstroController::class, 'muhratMonth'])->name('astro.muhrat.month');
+    Route::post('/muhrat/year',  [AstroController::class, 'muhratYear'])->name('astro.muhrat.year');
     Route::post('/varga',     [AstroController::class, 'varga'])->name('astro.varga');
     Route::post('/ekadashi',  [AstroController::class, 'ekadashiYear'])->name('astro.ekadashi');
+    Route::post('/tarabal-murti', [AstroController::class, 'tarabalMurti'])->name('astro.tarabal-murti');
 });

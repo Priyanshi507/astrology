@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Features\Planetary;
 
 /**
  * ShadBalaCalculator — Complete Six-fold Planetary Strength
@@ -781,148 +781,281 @@ class ShadBalaCalculator
     //  HTML RENDERER  — soft light palette matching planet tiles
     // ════════════════════════════════════════════════════════════
 
-    public static function renderHtml(array $shadbala): string
-    {
-        // ── Helper: get soft palette ──────────────────────────────
-        $sc = fn(string $pid): array => self::SOFT[$pid]
-            ?? ['bg'=>'#f4f4f4','border'=>'#d0d0d0','text'=>'#444','accent'=>'#666','abbr'=>'?'];
-
-        $html = '<div style="font-family:\'DM Sans\',sans-serif">';
-
-        // ── Summary bar cards ─────────────────────────────────────
-        $html .= '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:18px">';
-        foreach ($shadbala as $pid => $data) {
-            $s    = $sc($pid);
-            $pct  = min(100, $data['percent']);
-            $good = $data['isStrong'];
-            $barC = $good ? $s['accent'] : '#e05050';
-            $bdC  = $good ? $s['border'] : '#f0b0b0';
-
-            $html .= '<div style="background:'.$s['bg'].';border-radius:14px;padding:12px 8px 10px;'
-                   . 'border:1.5px solid '.$bdC.';text-align:center">'
-                   . '<div style="color:'.$s['accent'].';font-size:.95rem;font-weight:900">'.$s['abbr'].'</div>'
-                   . '<div style="font-size:.63rem;color:'.$s['text'].';opacity:.75;margin:2px 0 6px">'
-                   . $data['rupas'].' Ru</div>'
-                   . '<div style="height:44px;background:rgba(0,0,0,.06);border-radius:6px;overflow:hidden;'
-                   . 'display:flex;flex-direction:column-reverse;margin-bottom:6px">'
-                   . '<div style="background:'.$barC.';width:100%;height:'.$pct.'%;'
-                   . 'border-radius:6px"></div></div>'
-                   . '<div style="font-size:.6rem;color:'.($good ? $s['accent'] : '#d04040').';font-weight:800">'
-                   . ($good ? '✓' : '✗').' '.$data['grade'].'</div>'
-                   . '<div style="font-size:.57rem;color:#9aabbf;margin-top:2px">min '.$data['minRupas'].' Ru</div>'
-                   . '</div>';
-        }
-        $html .= '</div>';
-
-        // ── Detailed table ────────────────────────────────────────
-        $html .= '<div style="border-radius:14px;overflow:hidden;border:1.5px solid #e0e8f0;'
-               . 'box-shadow:0 2px 12px rgba(13,40,70,.07)">';
-        $html .= '<table style="width:100%;border-collapse:collapse;font-size:.78rem">';
-
-        // Header
-        $html .= '<thead><tr style="background:linear-gradient(120deg,#f0f4f8,#e4ecf4)">';
-        foreach (['Planet','Sthana','Dig','Kaala','Chesta','Naisargika','Drig','Total','Rupas','Grade'] as $c) {
-            $html .= '<th style="padding:10px 8px;text-align:center;color:#3a5a78;font-size:.63rem;'
-                   . 'text-transform:uppercase;letter-spacing:.8px;font-weight:800;'
-                   . 'border-bottom:2px solid #d0dce8;white-space:nowrap">'.$c.'</th>';
-        }
-        $html .= '</tr></thead><tbody>';
-
-        $ri = 0;
-        foreach ($shadbala as $pid => $data) {
-            $s     = $sc($pid);
-            $isAlt = ($ri++ % 2 === 1);
-            $bg    = $isAlt ? '#f8fafb' : '#ffffff';
-            $isSt  = $data['isStrong'];
-            $st    = $data['sthanaBala'];
-            $ka    = $data['kaalaBala'];
-
-            $html .= '<tr style="background:'.$bg.';border-bottom:1px solid #eaeff4">';
-
-            // Planet cell with soft badge
-            $html .= '<td style="padding:10px 8px;text-align:center">'
-                   . '<div style="display:inline-flex;align-items:center;justify-content:center;'
-                   . 'width:30px;height:30px;border-radius:8px;background:'.$s['bg'].';'
-                   . 'border:1.5px solid '.$s['border'].';margin-bottom:2px">'
-                   . '<span style="color:'.$s['accent'].';font-weight:900;font-size:.88rem">'.$s['abbr'].'</span>'
-                   . '</div>'
-                   . '<div style="color:'.$s['text'].';font-size:.6rem;text-transform:capitalize;opacity:.8">'.$pid.'</div>'
-                   . '</td>';
-
-            // Sthana (tooltip with sub-components)
-            $html .= '<td style="padding:10px 6px;text-align:center" '
-                   . 'title="Uchcha:'.$st['ucchaBala'].' · Sapta:'.$st['saptavargaBala']
-                   . ' · Oja:'.$st['ojayugmaBala'].' · Kendra:'.$st['kendraBala']
-                   . ' · Drekkana:'.$st['drekkanaBala'].'">'
-                   . '<strong style="color:#2d4a62">'.$st['total'].'</strong></td>';
-
-            // Dig
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:#2d4a62">'.$data['digBala'].'</strong></td>';
-
-            // Kaala (tooltip with sub-components)
-            $html .= '<td style="padding:10px 6px;text-align:center" '
-                   . 'title="Natho:'.$ka['nathoBala'].' · Paksha:'.$ka['pakshaBala']
-                   . ' · Tribhaga:'.$ka['tribhagaBala'].' · Vara:'.$ka['varaBala']
-                   . ' · Hora:'.$ka['horaBala'].' · Ayana:'.$ka['ayanaBala'].'">'
-                   . '<strong style="color:#2d4a62">'.$ka['total'].'</strong></td>';
-
-            // Chesta
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:#2d4a62">'.$data['chestaBala'].'</strong></td>';
-
-            // Naisargika
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:#2d4a62">'.$data['naisargikaBala'].'</strong></td>';
-
-            // Drig (green if positive, red if negative)
-            $dPos = $data['drigBala'] >= 0;
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:'.($dPos ? '#2e7a4e' : '#c04040').'">'
-                   . $data['drigBala'].'</strong></td>';
-
-            // Total (planet accent colour)
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:'.$s['accent'].';font-size:.92rem">'.$data['total'].'</strong></td>';
-
-            // Rupas (green/red based on strength)
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<strong style="color:'.($isSt ? $s['accent'] : '#d04040').';font-size:.88rem">'
-                   . $data['rupas'].'</strong>'
-                   . '<div style="color:#9aabbf;font-size:.6rem">/ '.$data['minRupas'].'</div>'
-                   . '</td>';
-
-            // Grade badge — semantic soft colours
-            [$gradeC, $gradeBg] = match($data['grade']) {
-                'Exceptional', 'Very Strong' => ['#2e7a4e', '#e6f4ec'],
-                'Strong'                     => ['#1a7ab5', '#eaf4fb'],
-                'Moderate'                   => ['#b36000', '#fdf6e3'],
-                'Weak'                       => ['#c0311f', '#fce8e6'],
-                default                      => ['#9c2d8a', '#f9edf7'],
-            };
-            $html .= '<td style="padding:10px 6px;text-align:center">'
-                   . '<span style="background:'.$gradeBg.';color:'.$gradeC.';'
-                   . 'border:1px solid '.$gradeC.'40;border-radius:20px;'
-                   . 'padding:3px 10px;font-weight:700;font-size:.65rem;white-space:nowrap">'
-                   . $data['grade'].'</span></td>';
-
-            $html .= '</tr>';
-        }
-
-        $html .= '</tbody></table></div>';
-
-        // ── Legend ────────────────────────────────────────────────
-        $html .= '<div style="margin-top:12px;font-size:.72rem;color:#5a7a93;line-height:1.9;'
-               . 'background:#f4f8fc;border-radius:10px;padding:10px 16px;border:1px solid #dde8f0">'
-               . '<strong style="color:#2d4a62">Shadbala Components:</strong> '
-               . 'Sthana = Positional · Dig = Directional · Kaala = Temporal · '
-               . 'Chesta = Motional · Naisargika = Natural · Drig = Aspectual. '
-               . 'All values in <em>Shashtiamshas (Virupas)</em>. '
-               . 'Divide by 60 to get <em>Rupas</em>. '
-               . 'Hover Sthana / Kaala columns for sub-component breakdown.'
-               . '</div>';
-
-        $html .= '</div>';
-        return $html;
+   public static function renderHtml(array $shadbala): string
+{
+    // ── Soft palette helper ──────────────────────────────────────
+    $sc = fn(string $pid): array => self::SOFT[$pid]
+        ?? ['bg'=>'#f4f4f4','border'=>'#d0d0d0','text'=>'#444','accent'=>'#666','abbr'=>'?'];
+ 
+    $html = '<div style="font-family:\'DM Sans\',sans-serif">';
+ 
+    // ════════════════════════════════════════════════════════════
+    //  VERTICAL BAR CHART
+    // ════════════════════════════════════════════════════════════
+    $chartH   = 200;   // chart area height (px)
+    $barW     = 36;    // bar width (px)
+    $barGap   = 18;    // gap between bars
+    $padLeft  = 44;    // y-axis gutter
+    $padRight = 12;
+    $padTop   = 14;
+    $padBot   = 58;    // room for labels
+ 
+    // Determine y-axis ceiling
+    $maxRupas = 0.0;
+    foreach ($shadbala as $data) {
+        if ($data['rupas'] > $maxRupas) $maxRupas = $data['rupas'];
     }
+    $maxRupas = max($maxRupas * 1.20, 10.0);
+ 
+    // Visual green/red split at 6 Rupas (visual midpoint — typical minimum)
+    $splitRupas = 6.0;
+ 
+    $nPlanets = count($shadbala);
+    $totalW   = $padLeft + ($barW + $barGap) * $nPlanets - $barGap + $padRight;
+    $svgH     = $chartH + $padTop + $padBot;
+ 
+    // y-pixel for a Rupas value (measured from top of chart area)
+    $toY = fn(float $v): float => $chartH - ($v / $maxRupas) * $chartH;
+ 
+    $splitYabs = $padTop + $toY($splitRupas);   // absolute y of threshold line
+ 
+    // ── SVG open ────────────────────────────────────────────────
+    $svg  = '<svg xmlns="http://www.w3.org/2000/svg" ';
+    $svg .= 'viewBox="0 0 '.$totalW.' '.$svgH.'" ';
+    $svg .= 'style="width:100%;max-width:'.min($totalW * 1.6, 680).'px;';
+    $svg .= 'display:block;overflow:visible;margin:0 auto">';
+ 
+    // Drop-shadow filter
+    $svg .= '<defs>
+      <filter id="sb_shadow" x="-15%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="rgba(0,0,0,.15)"/>
+      </filter>
+    </defs>';
+ 
+    $chartX2 = $totalW - $padRight;
+    $chartW  = $chartX2 - $padLeft;
+ 
+    // ── Green zone (above split) ─────────────────────────────────
+    $greenH = $splitYabs - $padTop;
+    if ($greenH > 0) {
+        $svg .= '<rect x="'.$padLeft.'" y="'.$padTop.'" ';
+        $svg .= 'width="'.$chartW.'" height="'.round($greenH,1).'" ';
+        $svg .= 'fill="#c8eecb" rx="4 4 0 0"/>';
+    }
+ 
+    // ── Red zone (below split) ───────────────────────────────────
+    $redTop = $splitYabs;
+    $redH   = ($padTop + $chartH) - $redTop;
+    if ($redH > 0) {
+        $svg .= '<rect x="'.$padLeft.'" y="'.round($redTop,1).'" ';
+        $svg .= 'width="'.$chartW.'" height="'.round($redH,1).'" ';
+        $svg .= 'fill="#f5c6c6" rx="0 0 4 4"/>';
+    }
+ 
+    // ── Horizontal grid lines ────────────────────────────────────
+    for ($g = 0; $g <= ceil($maxRupas); $g += 2) {
+        $gy = round($padTop + $toY((float)$g), 1);
+        if ($gy < $padTop - 1 || $gy > $padTop + $chartH + 1) continue;
+        $svg .= '<line x1="'.$padLeft.'" y1="'.$gy.'" x2="'.$chartX2.'" y2="'.$gy.'" ';
+        $svg .= 'stroke="rgba(0,0,0,.12)" stroke-width="1" stroke-dasharray="3,3"/>';
+        $svg .= '<text x="'.($padLeft - 4).'" y="'.($gy + 3.5).'" ';
+        $svg .= 'text-anchor="end" font-size="9" fill="#777" ';
+        $svg .= 'font-family="DM Sans,sans-serif">'.$g.'</text>';
+    }
+ 
+    // ── Threshold split line ─────────────────────────────────────
+    $svg .= '<line x1="'.$padLeft.'" y1="'.round($splitYabs,1).'" ';
+    $svg .= 'x2="'.$chartX2.'" y2="'.round($splitYabs,1).'" ';
+    $svg .= 'stroke="#333" stroke-width="2"/>';
+ 
+    // ── Bars ─────────────────────────────────────────────────────
+    $i = 0;
+    foreach ($shadbala as $pid => $data) {
+        $s    = $sc($pid);
+        $barX = $padLeft + $i * ($barW + $barGap);
+        $barH = max(3, ($data['rupas'] / $maxRupas) * $chartH);
+        $barY = round($padTop + $chartH - $barH, 1);
+ 
+        // ── Bar body (cream) ────────────────────────────────────
+        $svg .= '<rect x="'.$barX.'" y="'.$barY.'" ';
+        $svg .= 'width="'.$barW.'" height="'.round($barH,1).'" ';
+        $svg .= 'fill="#f7f2e0" stroke="'.$s['accent'].'" stroke-width="1.2" ';
+        $svg .= 'rx="2" filter="url(#sb_shadow)"/>';
+ 
+        // ── Coloured top cap ─────────────────────────────────────
+        $capH = min(6, $barH);
+        $svg .= '<rect x="'.$barX.'" y="'.$barY.'" ';
+        $svg .= 'width="'.$barW.'" height="'.round($capH,1).'" ';
+        $svg .= 'fill="'.$s['accent'].'" rx="2"/>';
+ 
+        // ── Per-planet min threshold tick ────────────────────────
+        $minY = round($padTop + $toY($data['minRupas']), 1);
+        if ($minY >= $padTop && $minY <= $padTop + $chartH) {
+            $svg .= '<line x1="'.($barX - 3).'" y1="'.$minY.'" ';
+            $svg .= 'x2="'.($barX + $barW + 3).'" y2="'.$minY.'" ';
+            $svg .= 'stroke="'.$s['accent'].'" stroke-width="1.5" ';
+            $svg .= 'stroke-dasharray="3,2" opacity=".65"/>';
+        }
+ 
+        // ── Rupas value above bar ─────────────────────────────────
+        $valY = max($padTop + 9, $barY - 4);
+        $svg .= '<text x="'.($barX + $barW / 2).'" y="'.$valY.'" ';
+        $svg .= 'text-anchor="middle" font-size="9.5" font-weight="800" ';
+        $svg .= 'fill="'.$s['accent'].'" font-family="DM Sans,sans-serif">';
+        $svg .= $data['rupas'].'</text>';
+ 
+        // ── Planet abbreviation (below chart) ────────────────────
+        $lblY = $padTop + $chartH + 15;
+        $svg .= '<text x="'.($barX + $barW / 2).'" y="'.$lblY.'" ';
+        $svg .= 'text-anchor="middle" font-size="11.5" font-weight="900" ';
+        $svg .= 'fill="'.$s['accent'].'" font-family="DM Sans,sans-serif">';
+        $svg .= $s['abbr'].'</text>';
+ 
+        // ── Rupas value below abbreviation ───────────────────────
+        $svg .= '<text x="'.($barX + $barW / 2).'" y="'.($lblY + 13).'" ';
+        $svg .= 'text-anchor="middle" font-size="8.5" fill="#555" ';
+        $svg .= 'font-family="DM Sans,sans-serif">'.$data['rupas'].'</text>';
+ 
+        // ── Strong / weak dot ────────────────────────────────────
+        $dotClr = $data['isStrong'] ? '#1e7a3e' : '#c03030';
+        $svg .= '<circle cx="'.($barX + $barW / 2).'" cy="'.($lblY + 27).'" ';
+        $svg .= 'r="4" fill="'.$dotClr.'"/>';
+ 
+        $i++;
+    }
+ 
+    // ── Chart border ─────────────────────────────────────────────
+    $svg .= '<rect x="'.$padLeft.'" y="'.$padTop.'" ';
+    $svg .= 'width="'.$chartW.'" height="'.$chartH.'" ';
+    $svg .= 'fill="none" stroke="rgba(0,0,0,.2)" stroke-width="1" rx="4"/>';
+ 
+    // ── Y-axis label ─────────────────────────────────────────────
+    $midY = $padTop + $chartH / 2;
+    $svg .= '<text transform="rotate(-90)" ';
+    $svg .= 'x="'.(-$midY).'" y="11" ';
+    $svg .= 'text-anchor="middle" font-size="9" fill="#999" ';
+    $svg .= 'font-family="DM Sans,sans-serif">Rupas</text>';
+ 
+    $svg .= '</svg>';
+ 
+    // ── Chart wrapper ─────────────────────────────────────────────
+    $html .= '<div style="background:#fff;border-radius:14px;padding:14px 10px 10px;';
+    $html .= 'border:1.5px solid #e0e8f0;box-shadow:0 2px 12px rgba(13,40,70,.07);';
+    $html .= 'margin-bottom:18px;overflow-x:auto">';
+ 
+    $html .= '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;padding:0 4px">';
+    $html .= '<span style="font-size:.7rem;font-weight:800;color:#3a5a78;text-transform:uppercase;letter-spacing:.8px">Shadbala — Rupas</span>';
+    $html .= '<span style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#1e7a3e">';
+    $html .= '<span style="display:inline-block;width:11px;height:11px;background:#c8eecb;border:1px solid #1e7a3e;border-radius:2px"></span>Strong zone</span>';
+    $html .= '<span style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#c03030">';
+    $html .= '<span style="display:inline-block;width:11px;height:11px;background:#f5c6c6;border:1px solid #c03030;border-radius:2px"></span>Below minimum</span>';
+    $html .= '<span style="font-size:.65rem;color:#999;margin-left:auto">Dashed line = planet\'s minimum Rupas</span>';
+    $html .= '</div>';
+ 
+    $html .= $svg;
+    $html .= '</div>';
+ 
+    // ════════════════════════════════════════════════════════════
+    //  DETAIL TABLE (unchanged from original)
+    // ════════════════════════════════════════════════════════════
+    $html .= '<div style="border-radius:14px;overflow:hidden;border:1.5px solid #e0e8f0;';
+    $html .= 'box-shadow:0 2px 12px rgba(13,40,70,.07)">';
+    $html .= '<table style="width:100%;border-collapse:collapse;font-size:.78rem">';
+ 
+    $html .= '<thead><tr style="background:linear-gradient(120deg,#f0f4f8,#e4ecf4)">';
+    foreach (['Planet','Sthana','Dig','Kaala','Chesta','Naisargika','Drig','Total','Rupas','Grade'] as $c) {
+        $html .= '<th style="padding:10px 8px;text-align:center;color:#3a5a78;font-size:.63rem;';
+        $html .= 'text-transform:uppercase;letter-spacing:.8px;font-weight:800;';
+        $html .= 'border-bottom:2px solid #d0dce8;white-space:nowrap">'.$c.'</th>';
+    }
+    $html .= '</tr></thead><tbody>';
+ 
+    $ri = 0;
+    foreach ($shadbala as $pid => $data) {
+        $s     = $sc($pid);
+        $isAlt = ($ri++ % 2 === 1);
+        $isSt  = $data['isStrong'];
+        $st    = $data['sthanaBala'];
+        $ka    = $data['kaalaBala'];
+ 
+        $html .= '<tr style="background:'.($isAlt ? '#f8fafb' : '#ffffff').';border-bottom:1px solid #eaeff4">';
+ 
+        // Planet
+        $html .= '<td style="padding:10px 8px;text-align:center">'
+               . '<div style="display:inline-flex;align-items:center;justify-content:center;'
+               . 'width:30px;height:30px;border-radius:8px;background:'.$s['bg'].';'
+               . 'border:1.5px solid '.$s['border'].';margin-bottom:2px">'
+               . '<span style="color:'.$s['accent'].';font-weight:900;font-size:.88rem">'.$s['abbr'].'</span>'
+               . '</div>'
+               . '<div style="color:'.$s['text'].';font-size:.6rem;text-transform:capitalize;opacity:.8">'.$pid.'</div>'
+               . '</td>';
+ 
+        // Sthana
+        $html .= '<td style="padding:10px 6px;text-align:center" '
+               . 'title="Uchcha:'.$st['ucchaBala'].' · Sapta:'.$st['saptavargaBala']
+               . ' · Oja:'.$st['ojayugmaBala'].' · Kendra:'.$st['kendraBala']
+               . ' · Drekkana:'.$st['drekkanaBala'].'">'
+               . '<strong style="color:#2d4a62">'.$st['total'].'</strong></td>';
+ 
+        // Dig
+        $html .= '<td style="padding:10px 6px;text-align:center"><strong style="color:#2d4a62">'.$data['digBala'].'</strong></td>';
+ 
+        // Kaala
+        $html .= '<td style="padding:10px 6px;text-align:center" '
+               . 'title="Natho:'.$ka['nathoBala'].' · Paksha:'.$ka['pakshaBala']
+               . ' · Tribhaga:'.$ka['tribhagaBala'].' · Vara:'.$ka['varaBala']
+               . ' · Hora:'.$ka['horaBala'].' · Ayana:'.$ka['ayanaBala'].'">'
+               . '<strong style="color:#2d4a62">'.$ka['total'].'</strong></td>';
+ 
+        // Chesta / Naisargika
+        $html .= '<td style="padding:10px 6px;text-align:center"><strong style="color:#2d4a62">'.$data['chestaBala'].'</strong></td>';
+        $html .= '<td style="padding:10px 6px;text-align:center"><strong style="color:#2d4a62">'.$data['naisargikaBala'].'</strong></td>';
+ 
+        // Drig
+        $dPos = $data['drigBala'] >= 0;
+        $html .= '<td style="padding:10px 6px;text-align:center">'
+               . '<strong style="color:'.($dPos ? '#2e7a4e' : '#c04040').'">'.$data['drigBala'].'</strong></td>';
+ 
+        // Total
+        $html .= '<td style="padding:10px 6px;text-align:center"><strong style="color:'.$s['accent'].';font-size:.92rem">'.$data['total'].'</strong></td>';
+ 
+        // Rupas
+        $html .= '<td style="padding:10px 6px;text-align:center">'
+               . '<strong style="color:'.($isSt ? $s['accent'] : '#d04040').';font-size:.88rem">'.$data['rupas'].'</strong>'
+               . '<div style="color:#9aabbf;font-size:.6rem">/ '.$data['minRupas'].'</div></td>';
+ 
+        // Grade
+        [$gradeC, $gradeBg] = match($data['grade']) {
+            'Exceptional', 'Very Strong' => ['#2e7a4e', '#e6f4ec'],
+            'Strong'                     => ['#1a7ab5', '#eaf4fb'],
+            'Moderate'                   => ['#b36000', '#fdf6e3'],
+            'Weak'                       => ['#c0311f', '#fce8e6'],
+            default                      => ['#9c2d8a', '#f9edf7'],
+        };
+        $html .= '<td style="padding:10px 6px;text-align:center">'
+               . '<span style="background:'.$gradeBg.';color:'.$gradeC.';'
+               . 'border:1px solid '.$gradeC.'40;border-radius:20px;'
+               . 'padding:3px 10px;font-weight:700;font-size:.65rem;white-space:nowrap">'
+               . $data['grade'].'</span></td>';
+ 
+        $html .= '</tr>';
+    }
+ 
+    $html .= '</tbody></table></div>';
+ 
+    // ── Legend footer ─────────────────────────────────────────────
+    $html .= '<div style="margin-top:12px;font-size:.72rem;color:#5a7a93;line-height:1.9;'
+           . 'background:#f4f8fc;border-radius:10px;padding:10px 16px;border:1px solid #dde8f0">'
+           . '<strong style="color:#2d4a62">Shadbala Components:</strong> '
+           . 'Sthana = Positional · Dig = Directional · Kaala = Temporal · '
+           . 'Chesta = Motional · Naisargika = Natural · Drig = Aspectual. '
+           . 'All values in <em>Shashtiamshas (Virupas)</em>. '
+           . 'Divide by 60 to get <em>Rupas</em>. '
+           . 'Hover Sthana / Kaala columns for sub-component breakdown.'
+           . '</div>';
+ 
+    $html .= '</div>';
+    return $html;
+}
+ 
 }
