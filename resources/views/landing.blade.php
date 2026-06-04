@@ -18,13 +18,13 @@
   --shadow:0 8px 36px rgba(0,0,0,.5);
 }
 [data-theme="light"]{
-  --bg:#f5f0e6;--bg2:#ede8d8;--bg3:#e4dcc8;
-  --card:rgba(255,255,255,.88);--card-b:rgba(0,0,0,.1);--card-h:rgba(255,255,255,.96);
-  --gold:#7a5a08;--gold-l:#b07c10;--gold-d:#4a3800;
-  --sky:#1a5a90;--sky-l:#2878b8;--sky-d:#0e3860;
-  --text:#14100a;--text-m:#5a4828;--text-d:#8a7450;
-  --accent:#b84808;--green:#1a8850;--red:#c01808;--purple:#4828a0;
-  --nav-bg:rgba(245,240,230,.92);--shadow:0 4px 20px rgba(0,0,0,.14);
+  --bg:#f6f1e6;--bg2:#efe8d9;--bg3:#e7dec9;
+  --card:#fffdf8;--card-b:rgba(120,92,30,.18);--card-h:#fffefb;
+  --gold:#7a5608;--gold-l:#a87810;--gold-d:#4a3400;
+  --sky:#175888;--sky-l:#2274b0;--sky-d:#0c3458;
+  --text:#1a130a;--text-m:#5c4824;--text-d:#8c7448;
+  --accent:#b04400;--green:#187a48;--red:#bc1c08;--purple:#42239a;
+  --nav-bg:rgba(246,241,230,.94);--shadow:0 6px 24px rgba(90,66,20,.13);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:18px;scroll-behavior:smooth}
@@ -41,8 +41,8 @@ nav{position:fixed;top:0;inset-inline:0;z-index:300;height:64px;display:flex;ali
 .nav-ib{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--card-b);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:.75rem;font-weight:800;color:var(--text-m);letter-spacing:.3px}
 .nav-ib:hover{border-color:var(--gold);color:var(--gold)}
 .nav-ib i{font-size:1rem}
-.nav-cta{padding:8px 22px;border-radius:40px;background:var(--gold);color:#fff;font-size:.85rem;font-weight:700;text-decoration:none;transition:opacity .2s,transform .15s;white-space:nowrap;border:none;cursor:pointer}
-.nav-cta:hover{opacity:.85;transform:translateY(-1px)}
+.nav-cta{padding:8px 22px;border-radius:40px;background:linear-gradient(135deg,#8a6208,#4a3000);color:#fff;font-size:.85rem;font-weight:700;text-decoration:none;transition:transform .15s,box-shadow .2s;white-space:nowrap;border:none;cursor:pointer;box-shadow:0 3px 12px rgba(100,70,0,.4)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(100,70,0,.55)}
 @media(max-width:800px){.nav-links a:not(.nav-cta){display:none}.nav-sep{display:none}}
 
 /* ── HERO ── */
@@ -61,8 +61,9 @@ nav{position:fixed;top:0;inset-inline:0;z-index:300;height:64px;display:flex;ali
 @media(max-width:960px){.hero-sub{margin-inline:auto;margin-bottom:28px}}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap}
 @media(max-width:960px){.hero-btns{justify-content:center}}
-.btn-p{background:var(--gold);color:#fff;padding:14px 32px;border-radius:50px;font-weight:700;font-size:.95rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:opacity .2s,transform .15s,box-shadow .2s;box-shadow:0 6px 22px rgba(200,140,26,.4)}
-.btn-p:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,140,26,.55)}
+.btn-p{background:linear-gradient(135deg,#a87808,#5a3c00);color:#fff;padding:14px 32px;border-radius:50px;font-weight:700;font-size:.95rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 22px rgba(120,80,0,.42)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(120,80,0,.6)}
+.btn-p i,.btn-p span{color:#fff}
 .btn-g{color:var(--text-m);border:1.5px solid var(--card-b);padding:13px 26px;border-radius:50px;font-size:.92rem;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:border-color .2s,color .2s}
 .btn-g:hover{border-color:var(--gold);color:var(--gold)}
 /* orrery */
@@ -128,13 +129,18 @@ nav{position:fixed;top:0;inset-inline:0;z-index:300;height:64px;display:flex;ali
 .plc-ret{display:inline-block;font-size:.65rem;font-weight:800;background:rgba(232,120,40,.12);color:var(--accent);border:1px solid rgba(232,120,40,.28);border-radius:20px;padding:2px 8px;margin-top:5px}
 
 /* ── CHARTS SECTION ── */
-.chart-render-wrap{overflow-x:auto;border-radius:12px;width:100%}
-.chart-render-wrap svg{max-width:100%!important;height:auto!important}
-.si-box{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:26px;margin-top:28px}
-.chart-box{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:26px}
-.chart-title{font-family:'Playfair Display',serif;font-size:1.18rem;font-weight:700;color:var(--text);margin-bottom:4px}
-.chart-sub{font-size:.8rem;color:var(--text-m);margin-bottom:18px}
-.chart-cv-wrap{display:flex;justify-content:center}
+.charts-2col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
+@media(max-width:820px){.charts-2col{grid-template-columns:1fr}}
+.chart-box{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:24px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.chart-box-head{display:flex;align-items:center;gap:11px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--card-b)}
+.chart-box-head .cbi{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.chart-title{font-family:'Playfair Display',serif;font-size:1.14rem;font-weight:700;color:var(--text)}
+.chart-sub{font-size:.78rem;color:var(--text-m);margin-top:2px}
+.chart-cv-wrap{display:flex;justify-content:center;align-items:center;flex:1}
+.chart-cv-wrap canvas{width:100%;max-width:380px;height:auto;aspect-ratio:1/1}
+.chart-legend-row{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--card-b)}
+.clg{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--text-m)}
+.clg b{font-weight:700}
 /* ── DASHA CARDS ── */
 .dasha-timeline{display:flex;height:52px;border-radius:12px;overflow:hidden;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .dt-seg{display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;cursor:default;transition:filter .2s;overflow:hidden}
@@ -372,30 +378,42 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
 <section class="sec sec-alt" id="charts">
   <div class="ey"><i class="ph ph-chart-donut-slice"></i> <span class="t" data-en="Vedic Birth Charts" data-hi="वैदिक जन्म कुंडली">Vedic Birth Charts</span></div>
   <h2 class="stitle t" data-en="North &amp; South Indian Kundali" data-hi="उत्तर और दक्षिण भारतीय कुंडली">North &amp; South Indian Kundali</h2>
-  <p class="ssub t" data-en="Live planetary positions · New Delhi · {{ $dateDisplay }}" data-hi="नई दिल्ली के लिए जीवंत ग्रह स्थितियाँ।">Live planetary positions · New Delhi · {{ $dateDisplay }}</p>
+  <p class="ssub t" data-en="D1 Rashi (birth chart) · Live planetary positions · New Delhi · {{ $dateDisplay }}. Lagna sign is highlighted; planet abbreviations sit in their sign/house." data-hi="D1 राशि (जन्म कुंडली) · नई दिल्ली के लिए जीवंत ग्रह स्थितियाँ। लग्न राशि हाइलाइट है।">D1 Rashi (birth chart) · Live planetary positions · New Delhi · {{ $dateDisplay }}. Lagna sign is highlighted; planet abbreviations sit in their sign/house.</p>
 
-  {{-- North Indian: AstroChartRenderer (D1 + D9 + D10 + house panel) --}}
-  <div class="rv" style="margin-bottom:32px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <i class="ph ph-chart-donut-slice" style="font-size:1.3rem;color:var(--gold)"></i>
-      <div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text)" class="t" data-en="North Indian — D1 Rashi · D9 Navamsha · D10 Dashamsha" data-hi="उत्तर भारतीय — D1 राशि · D9 नवांश · D10 दशांश">North Indian — D1 Rashi · D9 Navamsha · D10 Dashamsha</div>
-        <div style="font-size:.82rem;color:var(--text-m)" class="t" data-en="Diamond layout · Houses clockwise from top · Sidereal (Lahiri)" data-hi="हीरे का आकार · शीर्ष से घड़ी की दिशा · सायन (लाहिरी)">Diamond layout · Houses clockwise from top · Sidereal (Lahiri)</div>
+  <div class="charts-2col rv">
+    {{-- North Indian — diamond, LEFT --}}
+    <div class="chart-box">
+      <div class="chart-box-head">
+        <div class="cbi" style="background:rgba(200,168,75,.14);color:var(--gold)"><i class="ph ph-diamond"></i></div>
+        <div>
+          <div class="chart-title t" data-en="North Indian — D1 Rashi" data-hi="उत्तर भारतीय — D1 राशि">North Indian — D1 Rashi</div>
+          <div class="chart-sub t" data-en="Diamond style · House 1 fixed at top" data-hi="हीरा शैली · House 1 शीर्ष पर स्थिर">Diamond style · House 1 fixed at top</div>
+        </div>
+      </div>
+      <div class="chart-cv-wrap"><canvas id="niCv" width="380" height="380"></canvas></div>
+      <div class="chart-legend-row">
+        <span class="clg"><b style="color:var(--gold)">La</b> <span class="t" data-en="Lagna (Ascendant)" data-hi="लग्न">Lagna (Ascendant)</span></span>
+        <span class="clg"><b style="color:var(--text-m)">1–12</b> <span class="t" data-en="House numbers" data-hi="भाव">Houses</span></span>
+        <span class="clg"><b style="color:var(--accent)">℞</b> <span class="t" data-en="Retrograde" data-hi="वक्री">Retrograde</span></span>
       </div>
     </div>
-    <div class="chart-render-wrap">{!! $chartHtml !!}</div>
-  </div>
 
-  {{-- South Indian: Canvas --}}
-  <div class="rv si-box">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <i class="ph ph-squares-four" style="font-size:1.3rem;color:var(--sky-l)"></i>
-      <div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text)" class="t" data-en="South Indian (Kerala Style)" data-hi="दक्षिण भारतीय (केरल शैली)">South Indian (Kerala Style)</div>
-        <div style="font-size:.82rem;color:var(--text-m)" class="t" data-en="Fixed sign grid · Lagna sign highlighted with border" data-hi="स्थिर राशि ग्रिड · लग्न राशि हाइलाइट">Fixed sign grid · Lagna sign highlighted with border</div>
+    {{-- South Indian — grid, RIGHT --}}
+    <div class="chart-box">
+      <div class="chart-box-head">
+        <div class="cbi" style="background:rgba(72,144,196,.14);color:var(--sky-l)"><i class="ph ph-squares-four"></i></div>
+        <div>
+          <div class="chart-title t" data-en="South Indian — D1 Rashi" data-hi="दक्षिण भारतीय — D1 राशि">South Indian — D1 Rashi</div>
+          <div class="chart-sub t" data-en="Fixed sign grid · Lagna highlighted" data-hi="स्थिर राशि ग्रिड · लग्न हाइलाइट">Fixed sign grid · Lagna highlighted</div>
+        </div>
+      </div>
+      <div class="chart-cv-wrap"><canvas id="siCv" width="380" height="380"></canvas></div>
+      <div class="chart-legend-row">
+        <span class="clg"><b style="color:var(--gold)">La</b> <span class="t" data-en="Lagna sign" data-hi="लग्न राशि">Lagna sign</span></span>
+        <span class="clg"><b style="color:var(--text-m)">Me–Pi</b> <span class="t" data-en="Fixed zodiac signs" data-hi="स्थिर राशियाँ">Fixed signs</span></span>
+        <span class="clg"><b style="color:var(--accent)">℞</b> <span class="t" data-en="Retrograde" data-hi="वक्री">Retrograde</span></span>
       </div>
     </div>
-    <div class="chart-cv-wrap"><canvas id="siCv" width="440" height="440" style="max-width:min(100%,440px)"></canvas></div>
   </div>
 </section>
 
@@ -877,93 +895,105 @@ function redrawAll(){
 }
 window.__pd=PD;
 
-// ── NORTH INDIAN CHART ────────────────────────────────────────────────────
-// 4×4 grid: houses around border, center 2×2 empty
-// House positions: H1=(0,1),H2=(0,2),H3=(0,3),H4=(1,3),H5=(2,3),H6=(3,3),H7=(3,2),H8=(3,1),H9=(3,0),H10=(2,0),H11=(1,0),H12=(0,0)
-const NI_CELLS=[[0,0,12],[0,1,1],[0,2,2],[0,3,3],[1,3,4],[2,3,5],[3,3,6],[3,2,7],[3,1,8],[3,0,9],[2,0,10],[1,0,11]];
-const VSIGNS=['Me','Vr','Mi','Ka','Si','Kn','Tu','Vr2','Dh','Ma','Ku','Me2'];
-const VSIGN_F=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrishchika','Dhanu','Makara','Kumbha','Meena'];
 const VSIGN_S=['Me','Vr','Mi','Ka','Si','Kn','Tu','Vr','Dh','Mk','Ku','Me'];
 
+// ── SHARED CHART PALETTE (matches landing-page theme, dark + light) ───────
+function chartPal(){
+  const dark=isDark();
+  return {
+    dark,
+    bg:        dark ? '#0e1626' : '#fbf6ea',
+    border:    dark ? 'rgba(200,168,75,.6)'  : 'rgba(150,110,18,.6)',
+    line:      dark ? 'rgba(200,168,75,.34)' : 'rgba(150,110,18,.4)',
+    cellLine:  dark ? 'rgba(255,255,255,.13)' : 'rgba(120,92,30,.22)',
+    cellFill:  dark ? 'rgba(255,255,255,.022)' : 'rgba(255,252,244,.7)',
+    lagnaFill: dark ? 'rgba(200,168,75,.15)' : 'rgba(200,150,30,.16)',
+    lagnaLine: dark ? 'rgba(200,168,75,.75)' : 'rgba(150,108,12,.8)',
+    sign:      dark ? 'rgba(200,168,75,.78)' : 'rgba(120,86,12,.9)',
+    centre:    dark ? 'rgba(200,168,75,.34)' : 'rgba(150,108,18,.4)',
+  };
+}
+
+// ── NORTH INDIAN CHART (diamond / kite style · D1 Rashi) ──────────────────
 function drawNorthChart(asi,pl){
   const ctx=cx2d('niCv');if(!ctx)return;
-  const W=320,cell=W/4,dark=isDark();
+  const W=ctx.canvas.width,S=W,P=chartPal();
   ctx.clearRect(0,0,W,W);
-  // background
-  ctx.fillStyle=dark?'#0c1220':'#f0ead8';ctx.fillRect(0,0,W,W);
-  // build planets-per-house
+  ctx.fillStyle=P.bg;ctx.fillRect(0,0,W,W);
+  const TL=[0,0],TR=[S,0],BR=[S,S],BL=[0,S];
+  const MT=[S/2,0],MR=[S,S/2],MB=[S/2,S],ML=[0,S/2],C=[S/2,S/2];
+  const P1=[S/4,S/4],P2=[3*S/4,3*S/4],P3=[3*S/4,S/4],P4=[S/4,3*S/4];
+  const H=[
+    {p:[MT,P3,C,P1], a:[S/2,S/4]},
+    {p:[TL,MT,P1],   a:[S/4,S*0.11]},
+    {p:[TL,P1,ML],   a:[S*0.11,S/4]},
+    {p:[ML,P1,C,P4], a:[S/4,S/2]},
+    {p:[ML,P4,BL],   a:[S*0.11,3*S/4]},
+    {p:[BL,P4,MB],   a:[S/4,S*0.89]},
+    {p:[MB,P4,C,P2], a:[S/2,3*S/4]},
+    {p:[MB,P2,BR],   a:[3*S/4,S*0.89]},
+    {p:[BR,P2,MR],   a:[S*0.89,3*S/4]},
+    {p:[MR,P2,C,P3], a:[3*S/4,S/2]},
+    {p:[MR,P3,TR],   a:[S*0.89,S/4]},
+    {p:[TR,P3,MT],   a:[3*S/4,S*0.11]},
+  ];
   const byH={};
-  for(const[pid,p]of Object.entries(pl)){const h=((p.signIdx-asi+12)%12)+1;if(!byH[h])byH[h]=[];byH[h].push({pid,abbr:p.abbr,col:p.color,retro:p.retro});}
-  // draw cells
-  NI_CELLS.forEach(([row,col,hnum])=>{
-    const x=col*cell,y=row*cell;
-    const isLagna=hnum===1;
-    ctx.fillStyle=isLagna?(dark?'rgba(200,168,75,.1)':'rgba(200,168,75,.15)'):dark?'rgba(255,255,255,.025)':'rgba(255,255,255,.6)';
-    ctx.fillRect(x+1,y+1,cell-2,cell-2);
-    ctx.strokeStyle=isLagna?(dark?'rgba(200,168,75,.6)':'rgba(160,120,10,.7)'):dark?'rgba(255,255,255,.12)':'rgba(0,0,0,.12)';
-    ctx.lineWidth=isLagna?2:1;ctx.strokeRect(x+1,y+1,cell-2,cell-2);
-    // house number
-    ctx.font=`bold 10px DM Mono,monospace`;ctx.fillStyle=dark?'rgba(255,255,255,.25)':'rgba(0,0,0,.2)';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(hnum,x+5,y+5);
-    // sign
-    const signIdx=(asi+hnum-1)%12;
-    ctx.font=`10px DM Sans,sans-serif`;ctx.fillStyle=dark?'rgba(200,168,75,.55)':'rgba(120,90,8,.65)';ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText(VSIGN_S[signIdx],x+cell-5,y+5);
-    // planets
+  for(const[pid,p]of Object.entries(pl)){const h=((p.signIdx-asi+12)%12)+1;(byH[h]=byH[h]||[]).push({abbr:p.abbr,col:p.color,retro:p.retro});}
+  ctx.beginPath();H[0].p.forEach((pt,i)=>i?ctx.lineTo(pt[0],pt[1]):ctx.moveTo(pt[0],pt[1]));ctx.closePath();
+  ctx.fillStyle=P.lagnaFill;ctx.fill();
+  ctx.strokeStyle=P.border;ctx.lineWidth=1.8;ctx.strokeRect(1.5,1.5,S-3,S-3);
+  ctx.strokeStyle=P.line;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(S,S);ctx.moveTo(S,0);ctx.lineTo(0,S);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(MT[0],MT[1]);ctx.lineTo(MR[0],MR[1]);ctx.lineTo(MB[0],MB[1]);ctx.lineTo(ML[0],ML[1]);ctx.closePath();ctx.stroke();
+  H.forEach((h,idx)=>{
+    const hnum=idx+1,signIdx=(asi+hnum-1)%12,ax=h.a[0],ay=h.a[1];
     const planets=byH[hnum]||[];
-    const cx2=x+cell/2,cy2=y+cell/2;
+    ctx.font='600 11px DM Sans,sans-serif';ctx.fillStyle=P.sign;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(VSIGN_S[signIdx],ax,ay-(planets.length?16:0));
     planets.forEach((p,i)=>{
-      const nx=planets.length===1?cx2:cx2+(i-planets.length/2+.5)*18;
-      const ny=cy2+(planets.length>3?Math.floor(i/3)*14:0);
-      ctx.font=`bold 12px DM Sans,sans-serif`;ctx.fillStyle=p.col;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(p.abbr+(p.retro?'℞':''),Math.min(Math.max(nx,x+12),x+cell-12),Math.min(Math.max(ny,y+18),y+cell-10));
+      const perRow=2,row=Math.floor(i/perRow),colp=i%perRow;
+      const inRow=Math.min(planets.length-row*perRow,perRow);
+      const px=ax+(colp-(inRow-1)/2)*24,py=ay+2+row*15;
+      ctx.font='bold 13px DM Sans,sans-serif';ctx.fillStyle=p.col;
+      ctx.fillText(p.abbr+(p.retro?'℞':''),px,py);
     });
-    if(isLagna){ctx.font='bold 10px DM Sans,sans-serif';ctx.fillStyle=dark?'rgba(200,168,75,.7)':'rgba(160,120,10,.7)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('As',x+cell/2,y+cell-4);}
+    if(hnum===1){ctx.font='bold 9px DM Sans,sans-serif';ctx.fillStyle=P.lagnaLine;ctx.fillText('La',ax,ay+(planets.length?Math.ceil(planets.length/2)*15+8:18));}
   });
-  // center decoration
-  ctx.fillStyle=dark?'rgba(200,168,75,.05)':'rgba(200,168,75,.08)';
-  ctx.fillRect(cell+1,cell+1,2*cell-2,2*cell-2);
-  ctx.strokeStyle=dark?'rgba(200,168,75,.12)':'rgba(160,120,10,.18)';ctx.lineWidth=1;
-  ctx.strokeRect(cell+1,cell+1,2*cell-2,2*cell-2);
-  ctx.font='bold 13px Playfair Display,serif';ctx.fillStyle=dark?'rgba(200,168,75,.3)':'rgba(160,120,10,.3)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('D1',W/2,W/2-8);
-  ctx.font='10px DM Sans,sans-serif';ctx.fillStyle=dark?'rgba(255,255,255,.2)':'rgba(0,0,0,.2)';ctx.fillText('Rashi',W/2,W/2+8);
-  // border
-  ctx.strokeStyle=dark?'rgba(200,168,75,.25)':'rgba(160,120,10,.3)';ctx.lineWidth=1.5;ctx.strokeRect(1,1,W-2,W-2);
 }
 
-// ── SOUTH INDIAN CHART ────────────────────────────────────────────────────
-// Fixed layout: Pi(0,0),Ar(0,1),Ta(0,2),Ge(0,3),Ca(1,3),Le(2,3),Vi(3,3),Li(3,2),Sc(3,1),Sa(3,0),Cp(2,0),Aq(1,0)
+// ── SOUTH INDIAN CHART (fixed sign grid · D1 Rashi) ───────────────────────
 const SI_CELLS=[[0,0,11],[0,1,0],[0,2,1],[0,3,2],[1,3,3],[2,3,4],[3,3,5],[3,2,6],[3,1,7],[3,0,8],[2,0,9],[1,0,10]];
-// si_cells: [row,col,signIdx(0=Aries)]
-
 function drawSouthChart(asi,pl){
   const ctx=cx2d('siCv');if(!ctx)return;
-  const W=320,cell=W/4,dark=isDark();
+  const W=ctx.canvas.width,cell=W/4,P=chartPal();
   ctx.clearRect(0,0,W,W);
-  ctx.fillStyle=dark?'#0c1220':'#f0ead8';ctx.fillRect(0,0,W,W);
-  // planets-per-sign
+  ctx.fillStyle=P.bg;ctx.fillRect(0,0,W,W);
   const byS={};
-  for(const[pid,p]of Object.entries(pl)){const si=p.signIdx;if(!byS[si])byS[si]=[];byS[si].push({pid,abbr:p.abbr,col:p.color,retro:p.retro});}
-  SI_CELLS.forEach(([row,col,signIdx])=>{
+  for(const[pid,p]of Object.entries(pl)){const si=p.signIdx;(byS[si]=byS[si]||[]).push({abbr:p.abbr,col:p.color,retro:p.retro});}
+  SI_CELLS.forEach(function(arr){
+    const row=arr[0],col=arr[1],signIdx=arr[2];
     const x=col*cell,y=row*cell,isLagna=signIdx===asi;
-    ctx.fillStyle=isLagna?(dark?'rgba(200,168,75,.1)':'rgba(200,168,75,.15)'):dark?'rgba(255,255,255,.025)':'rgba(255,255,255,.6)';
-    ctx.fillRect(x+1,y+1,cell-2,cell-2);
-    ctx.strokeStyle=isLagna?(dark?'rgba(200,168,75,.65)':'rgba(160,120,10,.7)'):dark?'rgba(255,255,255,.12)':'rgba(0,0,0,.12)';
-    ctx.lineWidth=isLagna?2.5:1;ctx.strokeRect(x+1,y+1,cell-2,cell-2);
-    ctx.font='bold 10px DM Sans,sans-serif';ctx.fillStyle=dark?'rgba(200,168,75,.55)':'rgba(120,90,8,.65)';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(VSIGN_S[signIdx],x+cell/2,y+5);
+    ctx.fillStyle=isLagna?P.lagnaFill:P.cellFill;ctx.fillRect(x,y,cell,cell);
+    ctx.strokeStyle=isLagna?P.lagnaLine:P.cellLine;ctx.lineWidth=isLagna?2.5:1;
+    const o=isLagna?1.5:0.5;ctx.strokeRect(x+o,y+o,cell-2*o,cell-2*o);
+    ctx.font='600 11px DM Sans,sans-serif';ctx.fillStyle=P.sign;ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText(VSIGN_S[signIdx],x+cell/2,y+6);
     const planets=byS[signIdx]||[];
     planets.forEach((p,i)=>{
-      const nx=x+cell/2+(i-planets.length/2+.5)*18,ny=y+cell/2+6;
-      ctx.font=`bold 12px DM Sans,sans-serif`;ctx.fillStyle=p.col;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(p.abbr+(p.retro?'℞':''),Math.min(Math.max(nx,x+12),x+cell-12),Math.min(Math.max(ny,y+20),y+cell-8));
+      const perRow=2,r=Math.floor(i/perRow),colp=i%perRow;
+      const inRow=Math.min(planets.length-r*perRow,perRow);
+      const px=x+cell/2+(colp-(inRow-1)/2)*24,py=y+cell/2+4+r*15;
+      ctx.font='bold 13px DM Sans,sans-serif';ctx.fillStyle=p.col;ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(p.abbr+(p.retro?'℞':''),px,py);
     });
+    if(isLagna){ctx.font='bold 9px DM Sans,sans-serif';ctx.fillStyle=P.lagnaLine;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('La',x+cell/2,y+cell-5);}
   });
-  // center
-  ctx.fillStyle=dark?'rgba(200,168,75,.05)':'rgba(200,168,75,.08)';ctx.fillRect(cell+1,cell+1,2*cell-2,2*cell-2);
-  ctx.strokeStyle=dark?'rgba(200,168,75,.12)':'rgba(160,120,10,.18)';ctx.lineWidth=1;ctx.strokeRect(cell+1,cell+1,2*cell-2,2*cell-2);
-  ctx.font='bold 13px Playfair Display,serif';ctx.fillStyle=dark?'rgba(200,168,75,.3)':'rgba(160,120,10,.3)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('D1',W/2,W/2-8);
-  ctx.font='10px DM Sans,sans-serif';ctx.fillStyle=dark?'rgba(255,255,255,.2)':'rgba(0,0,0,.2)';ctx.fillText('Rashi',W/2,W/2+8);
-  ctx.strokeStyle=dark?'rgba(200,168,75,.25)':'rgba(160,120,10,.3)';ctx.lineWidth=1.5;ctx.strokeRect(1,1,W-2,W-2);
+  ctx.fillStyle=P.dark?'rgba(200,168,75,.045)':'rgba(200,150,30,.06)';ctx.fillRect(cell,cell,2*cell,2*cell);
+  ctx.font='bold 15px Playfair Display,serif';ctx.fillStyle=P.centre;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('D1',W/2,W/2-9);
+  ctx.font='10px DM Sans,sans-serif';ctx.fillText('Rashi',W/2,W/2+9);
+  ctx.strokeStyle=P.border;ctx.lineWidth=1.8;ctx.strokeRect(1.5,1.5,W-3,W-3);
 }
-
 // ── SHADBALA ──────────────────────────────────────────────────────────────
 const SHAD=[
   {pid:'sun',    sym:'☀',nm:'Sun (Surya)',   col:'#d4921e',nb:60},

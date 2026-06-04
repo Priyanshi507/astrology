@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Features\Planetary\AstroCalculator;
 use App\Features\Festival\HinduFestivalCalculator;
-use App\Features\ChartRendering\AstroChartRenderer;
 
 class LandingController extends Controller
 {
@@ -133,14 +132,6 @@ class LandingController extends Controller
             ];
         }
 
-        // ── Rendered charts (D1 + D9 + D10 + house panel) ──────────────
-        $chartHtml = AstroChartRenderer::render(
-            $result['ascTrop'],
-            $result['planets'],
-            $ayan,
-            $result['dasha']
-        );
-
         // ── Rahu Kaal (which 1/8 part of the day is inauspicious) ──────
         $rKParts = [0 => 8, 1 => 2, 2 => 7, 3 => 5, 4 => 6, 5 => 3, 6 => 4];
         $rKPart  = $rKParts[$varaIdx] ?? 1;
@@ -163,7 +154,6 @@ class LandingController extends Controller
             'dateDisplay' => $date->format('d F Y'),
             'dayName'     => $pancha['vara']['en'],
             'ayan'        => round($ayan, 4),
-            'chartHtml'   => $chartHtml,
             'rahuKaal' => [
                 'start'   => substr(AstroCalculator::decToHMS($rKStart), 0, 5),
                 'end'     => substr(AstroCalculator::decToHMS($rKEnd),   0, 5),
