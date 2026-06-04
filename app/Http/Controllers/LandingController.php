@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Features\Planetary\AstroCalculator;
 use App\Features\Festival\HinduFestivalCalculator;
+use App\Features\ChartRendering\AstroChartRenderer;
 
 class LandingController extends Controller
 {
@@ -132,11 +133,55 @@ class LandingController extends Controller
             ];
         }
 
+        // ── Rendered charts (D1 + D9 + D10 + house panel) ──────────────
+        $chartHtml = AstroChartRenderer::render(
+            $result['ascTrop'],
+            $result['planets'],
+            $ayan,
+            $result['dasha']
+        );
+
+        // ── Rahu Kaal (which 1/8 part of the day is inauspicious) ──────
+        $rKParts = [0 => 8, 1 => 2, 2 => 7, 3 => 5, 4 => 6, 5 => 3, 6 => 4];
+        $rKPart  = $rKParts[$varaIdx] ?? 1;
+        $rKStart = $riseHr + ($rKPart - 1) * ($setHr - $riseHr) / 8;
+        $rKEnd   = $riseHr + $rKPart       * ($setHr - $riseHr) / 8;
+
+        // ── Abhijit Muhurat (solar noon ± 24 min, always auspicious) ───
+        $solarNoon = ($riseHr + $setHr) / 2;
+        $abStart   = $solarNoon - 24 / 60;
+        $abEnd     = $solarNoon + 24 / 60;
+
+        // ── Yamghantam (inauspicious, shifts each weekday) ──────────────
+        $ygParts = [0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 8, 5 => 1, 6 => 2];
+        $ygPart  = $ygParts[$varaIdx] ?? 1;
+        $ygStart = $riseHr + ($ygPart - 1) * ($setHr - $riseHr) / 8;
+        $ygEnd   = $riseHr + $ygPart       * ($setHr - $riseHr) / 8;
+
         return [
             'date'        => $date->format('Y-m-d'),
             'dateDisplay' => $date->format('d F Y'),
             'dayName'     => $pancha['vara']['en'],
             'ayan'        => round($ayan, 4),
+            'chartHtml'   => $chartHtml,
+            'rahuKaal' => [
+                'start'   => substr(AstroCalculator::decToHMS($rKStart), 0, 5),
+                'end'     => substr(AstroCalculator::decToHMS($rKEnd),   0, 5),
+                'startHr' => round($rKStart, 3),
+                'endHr'   => round($rKEnd,   3),
+            ],
+            'abhijit' => [
+                'start'   => substr(AstroCalculator::decToHMS($abStart), 0, 5),
+                'end'     => substr(AstroCalculator::decToHMS($abEnd),   0, 5),
+                'startHr' => round($abStart, 3),
+                'endHr'   => round($abEnd,   3),
+            ],
+            'yamghantam' => [
+                'start'   => substr(AstroCalculator::decToHMS($ygStart), 0, 5),
+                'end'     => substr(AstroCalculator::decToHMS($ygEnd),   0, 5),
+                'startHr' => round($ygStart, 3),
+                'endHr'   => round($ygEnd,   3),
+            ],
             'sunrise'     => $sunrise,
             'sunset'      => $sunset,
             'ascSignIdx'  => $ascSignIdx,

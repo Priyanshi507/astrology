@@ -128,12 +128,36 @@ nav{position:fixed;top:0;inset-inline:0;z-index:300;height:64px;display:flex;ali
 .plc-ret{display:inline-block;font-size:.65rem;font-weight:800;background:rgba(232,120,40,.12);color:var(--accent);border:1px solid rgba(232,120,40,.28);border-radius:20px;padding:2px 8px;margin-top:5px}
 
 /* ── CHARTS SECTION ── */
-.charts-wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-@media(max-width:900px){.charts-wrap{grid-template-columns:1fr}}
+.chart-render-wrap{overflow-x:auto;border-radius:12px;width:100%}
+.chart-render-wrap svg{max-width:100%!important;height:auto!important}
+.si-box{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:26px;margin-top:28px}
 .chart-box{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:26px}
 .chart-title{font-family:'Playfair Display',serif;font-size:1.18rem;font-weight:700;color:var(--text);margin-bottom:4px}
 .chart-sub{font-size:.8rem;color:var(--text-m);margin-bottom:18px}
 .chart-cv-wrap{display:flex;justify-content:center}
+/* ── DASHA CARDS ── */
+.dasha-timeline{display:flex;height:52px;border-radius:12px;overflow:hidden;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.dt-seg{display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;cursor:default;transition:filter .2s;overflow:hidden}
+.dt-seg:hover{filter:brightness(1.25);z-index:2}
+.dt-lbl{font-size:.68rem;font-weight:800;color:rgba(255,255,255,.92);text-align:center;padding:0 4px;line-height:1.3;white-space:nowrap;overflow:hidden}
+.dl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.dl-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:18px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.dl-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.dl-sym{font-size:2.2rem;line-height:1;margin-bottom:8px}
+.dl-nm{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.dl-hi{font-size:.82rem;color:var(--text-m);margin-bottom:6px}
+.dl-yr{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text-d);margin-bottom:8px}
+.dl-sig{font-size:.8rem;color:var(--text-m);line-height:1.55;margin-bottom:8px}
+.dl-gem{font-size:.72rem;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:4px}
+.dl-nat{display:inline-block;font-size:.62rem;font-weight:800;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-top:6px;margin-left:6px}
+/* ── MUHURAT EXTRAS ── */
+.muh-tl-wrap{background:var(--card);border:1px solid var(--card-b);border-radius:var(--rx);padding:22px;margin-bottom:28px}
+.muh-key-pills{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.muh-pill{border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex:1;min-width:155px;border:1px solid transparent}
+.muh-pill-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0}
+.muh-pill-lbl{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}
+.muh-pill-t{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:700;color:var(--text)}
+.muh-pill-d{font-size:.72rem;color:var(--text-m);margin-top:1px}
 
 /* ── SHADBALA ── */
 .shad-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
@@ -348,18 +372,30 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
 <section class="sec sec-alt" id="charts">
   <div class="ey"><i class="ph ph-chart-donut-slice"></i> <span class="t" data-en="Vedic Birth Charts" data-hi="वैदिक जन्म कुंडली">Vedic Birth Charts</span></div>
   <h2 class="stitle t" data-en="North &amp; South Indian Kundali" data-hi="उत्तर और दक्षिण भारतीय कुंडली">North &amp; South Indian Kundali</h2>
-  <p class="ssub t" data-en="Current planetary positions mapped on both chart styles. House 1 = Lagna sign at sunrise, New Delhi." data-hi="दोनों कुंडली शैलियों पर वर्तमान ग्रह स्थितियाँ।">Current planetary positions mapped on both chart styles. House 1 = Lagna sign at sunrise, New Delhi.</p>
-  <div class="charts-wrap rv">
-    <div class="chart-box">
-      <div class="chart-title t" data-en="North Indian (Shalivahana)" data-hi="उत्तर भारतीय (शालिवाहन)">North Indian (Shalivahana)</div>
-      <div class="chart-sub t" data-en="House 1 at top · houses go clockwise" data-hi="House 1 शीर्ष पर · घड़ी की दिशा में">House 1 at top · houses go clockwise</div>
-      <div class="chart-cv-wrap"><canvas id="niCv" width="320" height="320"></canvas></div>
+  <p class="ssub t" data-en="Live planetary positions · New Delhi · {{ $dateDisplay }}" data-hi="नई दिल्ली के लिए जीवंत ग्रह स्थितियाँ।">Live planetary positions · New Delhi · {{ $dateDisplay }}</p>
+
+  {{-- North Indian: AstroChartRenderer (D1 + D9 + D10 + house panel) --}}
+  <div class="rv" style="margin-bottom:32px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <i class="ph ph-chart-donut-slice" style="font-size:1.3rem;color:var(--gold)"></i>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text)" class="t" data-en="North Indian — D1 Rashi · D9 Navamsha · D10 Dashamsha" data-hi="उत्तर भारतीय — D1 राशि · D9 नवांश · D10 दशांश">North Indian — D1 Rashi · D9 Navamsha · D10 Dashamsha</div>
+        <div style="font-size:.82rem;color:var(--text-m)" class="t" data-en="Diamond layout · Houses clockwise from top · Sidereal (Lahiri)" data-hi="हीरे का आकार · शीर्ष से घड़ी की दिशा · सायन (लाहिरी)">Diamond layout · Houses clockwise from top · Sidereal (Lahiri)</div>
+      </div>
     </div>
-    <div class="chart-box">
-      <div class="chart-title t" data-en="South Indian (Kerala)" data-hi="दक्षिण भारतीय (केरल)">South Indian (Kerala)</div>
-      <div class="chart-sub t" data-en="Fixed signs · Lagna marked with border" data-hi="स्थिर राशियाँ · लग्न मोटी रेखा से">Fixed signs · Lagna marked with border</div>
-      <div class="chart-cv-wrap"><canvas id="siCv" width="320" height="320"></canvas></div>
+    <div class="chart-render-wrap">{!! $chartHtml !!}</div>
+  </div>
+
+  {{-- South Indian: Canvas --}}
+  <div class="rv si-box">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <i class="ph ph-squares-four" style="font-size:1.3rem;color:var(--sky-l)"></i>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text)" class="t" data-en="South Indian (Kerala Style)" data-hi="दक्षिण भारतीय (केरल शैली)">South Indian (Kerala Style)</div>
+        <div style="font-size:.82rem;color:var(--text-m)" class="t" data-en="Fixed sign grid · Lagna sign highlighted with border" data-hi="स्थिर राशि ग्रिड · लग्न राशि हाइलाइट">Fixed sign grid · Lagna sign highlighted with border</div>
+      </div>
     </div>
+    <div class="chart-cv-wrap"><canvas id="siCv" width="440" height="440" style="max-width:min(100%,440px)"></canvas></div>
   </div>
 </section>
 
@@ -390,9 +426,19 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
   <div class="ey"><i class="ph ph-hourglass"></i> <span class="t" data-en="Vimshottari Dasha Chakra" data-hi="विंशोत्तरी दशा चक्र">Vimshottari Dasha Chakra</span></div>
   <h2 class="stitle t" data-en="120-Year Planetary Cycle" data-hi="120-वर्षीय ग्रहीय चक्र">120-Year Planetary Cycle</h2>
   <p class="ssub t" data-en="Each lord rules for a fixed period based on the Moon's birth nakshatra. The cycle totals exactly 120 years." data-hi="प्रत्येक ग्रह जन्म नक्षत्र के आधार पर एक निश्चित अवधि शासन करता है।">Each lord rules for a fixed period based on the Moon's birth nakshatra. The cycle totals exactly 120 years.</p>
-  <div class="dasha-split rv">
-    <div class="dasha-wheel"><svg id="dashaSvg" viewBox="0 0 260 260" width="260" height="260"></svg></div>
-    <div class="dasha-legend" id="dashaLeg"></div>
+  {{-- Proportional timeline bar --}}
+  <div class="rv">
+    <div style="font-size:.84rem;color:var(--text-m);margin-bottom:12px" class="t" data-en="120-year cycle — each segment width proportional to the dasha period · hover for details" data-hi="120-वर्षीय चक्र — प्रत्येक खंड की चौड़ाई दशा अवधि के अनुपात में">120-year cycle — each segment width proportional to the dasha period · hover for details</div>
+    <div class="dasha-timeline" id="dashaTimeline"></div>
+    <div style="font-size:.72rem;color:var(--text-d);margin-top:6px;text-align:center">
+      <span style="font-family:'DM Mono',monospace">Ke·7 → Ve·20 → Su·6 → Mo·10 → Ma·7 → Ra·18 → Ju·16 → Sa·19 → Me·17 = 120 years</span>
+    </div>
+  </div>
+
+  {{-- 9 Lord cards --}}
+  <div style="margin-top:36px">
+    <div class="ey" style="margin-bottom:20px"><i class="ph ph-planet"></i> <span class="t" data-en="Nine Dasha Lords — Significations &amp; Characteristics" data-hi="नव दशा स्वामी — कारकत्व और विशेषताएं">Nine Dasha Lords — Significations &amp; Characteristics</span></div>
+    <div class="dl-cards rv" id="dashaCards"></div>
   </div>
 </section>
 
@@ -401,12 +447,48 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
 {{-- ══ MUHURAT / CHOGHADIYA ══ --}}
 <section class="sec" id="muhurat">
   <div class="ey"><i class="ph ph-clock"></i> <span class="t" data-en="Muhurat — Auspicious Timing" data-hi="मुहूर्त — शुभ समय">Muhurat — Auspicious Timing</span></div>
-  <h2 class="stitle t" data-en="Today's Choghadiya — {{ $dayName }}" data-hi="आज का चौघड़िया — {{ $vara['n'] ?? $dayName }}">Today's Choghadiya — {{ $dayName }}</h2>
-  <p class="ssub t" data-en="Eight time periods from sunrise to sunset, classified by auspiciousness for activities. New Delhi · {{ $sunrise }} to {{ $sunset }}." data-hi="सूर्योदय से सूर्यास्त तक आठ समय-खंड।">Eight time periods from sunrise to sunset, classified by auspiciousness for activities. New Delhi · {{ $sunrise }} to {{ $sunset }}.</p>
+  <h2 class="stitle t" data-en="Today's Choghadiya &amp; Key Muhurat Times" data-hi="आज का चौघड़िया और मुख्य मुहूर्त समय">Today's Choghadiya &amp; Key Muhurat Times</h2>
+  <p class="ssub t" data-en="Visual day timeline with 8 Choghadiya periods · Rahu Kaal · Abhijit Muhurat · Yam Ghantam · New Delhi" data-hi="सूर्योदय से सूर्यास्त तक आठ चौघड़िया · राहुकाल · अभिजित मुहूर्त">Visual day timeline · 8 Choghadiya periods · New Delhi · {{ $sunrise }} — {{ $sunset }}</p>
+
+  {{-- Visual day timeline --}}
+  <div class="muh-tl-wrap rv">
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px" class="t" data-en="Day Timeline — Sunrise to Sunset" data-hi="दिन टाइमलाइन — सूर्योदय से सूर्यास्त">Day Timeline — Sunrise to Sunset</div>
+    <div style="font-size:.8rem;color:var(--text-m);margin-bottom:14px">{{ $sunrise }} → {{ $sunset }} · {{ $dayName }}</div>
+    <canvas id="muhCv" width="900" height="72" style="width:100%;display:block;border-radius:10px"></canvas>
+    {{-- Key timing pills --}}
+    <div class="muh-key-pills">
+      <div class="muh-pill" style="background:rgba(216,56,32,.1);border-color:rgba(216,56,32,.28)">
+        <div class="muh-pill-ic" style="background:rgba(216,56,32,.2);color:#d83820"><i class="ph ph-warning"></i></div>
+        <div>
+          <div class="muh-pill-lbl" style="color:#d83820" class="t" data-en="Rahu Kaal" data-hi="राहुकाल">Rahu Kaal</div>
+          <div class="muh-pill-t">{{ $rahuKaal['start'] }} – {{ $rahuKaal['end'] }}</div>
+          <div class="muh-pill-d t" data-en="Avoid new beginnings · inauspicious" data-hi="नए कार्य वर्जित · अशुभ">Avoid new beginnings · inauspicious</div>
+        </div>
+      </div>
+      <div class="muh-pill" style="background:rgba(40,184,112,.1);border-color:rgba(40,184,112,.28)">
+        <div class="muh-pill-ic" style="background:rgba(40,184,112,.2);color:#28b870"><i class="ph ph-star-four"></i></div>
+        <div>
+          <div class="muh-pill-lbl" style="color:#28b870" class="t" data-en="Abhijit Muhurat" data-hi="अभिजित मुहूर्त">Abhijit Muhurat</div>
+          <div class="muh-pill-t">{{ $abhijit['start'] }} – {{ $abhijit['end'] }}</div>
+          <div class="muh-pill-d t" data-en="Best window of the day · always auspicious" data-hi="दिन का सर्वश्रेष्ठ समय · सदा शुभ">Best window of the day · always auspicious</div>
+        </div>
+      </div>
+      <div class="muh-pill" style="background:rgba(112,96,168,.1);border-color:rgba(112,96,168,.28)">
+        <div class="muh-pill-ic" style="background:rgba(112,96,168,.2);color:#7060a8"><i class="ph ph-prohibit"></i></div>
+        <div>
+          <div class="muh-pill-lbl" style="color:#7060a8" class="t" data-en="Yam Ghantam" data-hi="यम घंटम">Yam Ghantam</div>
+          <div class="muh-pill-t">{{ $yamghantam['start'] }} – {{ $yamghantam['end'] }}</div>
+          <div class="muh-pill-d t" data-en="Inauspicious · avoid travel" data-hi="अशुभ · यात्रा वर्जित">Inauspicious · avoid travel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- Choghadiya bars + guide --}}
   <div class="cho-grid rv">
     <div class="cho-chart">
-      <div style="font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--text);margin-bottom:4px" class="t" data-en="Day Choghadiya" data-hi="दिन चौघड़िया">Day Choghadiya</div>
-      <div style="font-size:.8rem;color:var(--text-m);margin-bottom:6px">{{ $sunrise }} — {{ $sunset }}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--text);margin-bottom:4px" class="t" data-en="Day Choghadiya (8 Periods)" data-hi="दिन चौघड़िया (8 काल)">Day Choghadiya (8 Periods)</div>
+      <div style="font-size:.8rem;color:var(--text-m);margin-bottom:14px">{{ $sunrise }} — {{ $sunset }} · {{ $dayName }}</div>
       <div class="cho-bars">
         @foreach($choghadiya as $ch)
         @php
@@ -419,7 +501,7 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
           <div class="cho-name-wrap" style="background:{{ $qBg }};border:1px solid {{ $qClass }}30">
             <div>
               <div class="cho-name" style="color:{{ $qClass }}">{{ $ch['name'] }}</div>
-              <div style="font-size:.72rem;color:var(--text-m)">{{ $ch['nameHi'] }}</div>
+              <div style="font-size:.76rem;color:var(--text-m)">{{ $ch['nameHi'] }}</div>
             </div>
             <div class="cho-badge" style="background:{{ $qClass }}20;color:{{ $qClass }};border:1px solid {{ $qClass }}40">{{ $qLabel }}</div>
           </div>
@@ -433,11 +515,11 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
         @foreach([
           ['#28b870','Amrit','अमृत','Moon — Best for all activities'],
           ['#4a90c4','Shubh','शुभ','Venus/Jupiter — Auspicious'],
-          ['#6ab04c','Labh','लाभ','Mercury — Good for gain'],
-          ['#a08060','Chal','चल','Mercury/Venus — Neutral, travel'],
-          ['#d83820','Rog','रोग','Mars — Avoid new starts'],
-          ['#7060a8','Kaal','काल','Saturn — Inauspicious'],
-          ['#c05018','Udveg','उद्वेग','Sun — Inauspicious, avoid'],
+          ['#6ab04c','Labh','लाभ','Mercury — Good for gain &amp; commerce'],
+          ['#a08060','Chal','चल','Mercury/Venus — Neutral, good for travel'],
+          ['#d83820','Rog','रोग','Mars — Avoid new starts, inauspicious'],
+          ['#7060a8','Kaal','काल','Saturn — Inauspicious, avoid all activities'],
+          ['#c05018','Udveg','उद्वेग','Sun — Inauspicious, avoid beginnings'],
         ] as [$col,$nm,$hi,$desc])
         <div class="cho-leg-row">
           <div class="cho-leg-dot" style="background:{{ $col }}"></div>
@@ -445,10 +527,10 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
         </div>
         @endforeach
       </div>
-      <div style="margin-top:24px;padding:16px;background:var(--card-b);border-radius:12px">
-        <div style="font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:6px" class="t" data-en="Open Full Muhurat Calculator" data-hi="पूर्ण मुहूर्त कैलकुलेटर खोलें">Full Muhurat Calculator</div>
-        <div style="font-size:.82rem;color:var(--text-m);margin-bottom:12px" class="t" data-en="Vivah, Griha Pravesh, Vahana and more — with month &amp; year scan." data-hi="विवाह, गृह प्रवेश, वाहन और अधिक।">Vivah, Griha Pravesh, Vahana and more — with month &amp; year scan.</div>
-        <a href="/astro" class="btn-p" style="font-size:.85rem;padding:10px 22px;display:inline-flex"><i class="ph ph-clock"></i>&nbsp;<span class="t" data-en="Open Muhurat" data-hi="मुहूर्त खोलें">Open Muhurat</span></a>
+      <div style="margin-top:24px;padding:18px;background:var(--card-b);border-radius:12px">
+        <div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:6px" class="t" data-en="Full Muhurat Calculator" data-hi="पूर्ण मुहूर्त कैलकुलेटर">Full Muhurat Calculator</div>
+        <div style="font-size:.85rem;color:var(--text-m);margin-bottom:14px" class="t" data-en="Vivah, Griha Pravesh, Vahana, Mundan and more — with month &amp; year scan." data-hi="विवाह, गृह प्रवेश, वाहन, मुंडन और अधिक।">Vivah, Griha Pravesh, Vahana, Mundan and more — with month &amp; year scan.</div>
+        <a href="/astro" class="btn-p" style="font-size:.88rem;padding:11px 24px;display:inline-flex;gap:8px"><i class="ph ph-clock"></i><span class="t" data-en="Open Muhurat" data-hi="मुहूर्त खोलें">Open Muhurat</span></a>
       </div>
     </div>
   </div>
@@ -505,7 +587,7 @@ footer{background:var(--bg2);border-top:1px solid var(--card-b);padding:28px 72p
 
 {{-- ══ DATA ══ --}}
 @php
-$_b=['date'=>$date,'sunrise'=>$sunrise,'sunset'=>$sunset,'tithi'=>$tithi,'vara'=>$vara,'nakshatra'=>$nakshatra,'yoga'=>$yoga,'karana'=>$karana,'ascSignIdx'=>$ascSignIdx,'choghadiya'=>$choghadiya];
+$_b=['date'=>$date,'sunrise'=>$sunrise,'sunset'=>$sunset,'tithi'=>$tithi,'vara'=>$vara,'nakshatra'=>$nakshatra,'yoga'=>$yoga,'karana'=>$karana,'ascSignIdx'=>$ascSignIdx,'choghadiya'=>$choghadiya,'rahuKaal'=>$rahuKaal,'abhijit'=>$abhijit,'yamghantam'=>$yamghantam];
 @endphp
 <script>
 const PD=@json($_b);
@@ -791,7 +873,7 @@ function redrawAll(){
   const p=window.__pd||PD;
   drawTithi(p);drawVara(p);drawNak(p);drawYoga(p);drawKarana(p);drawSun(p);
   drawNorthChart(ASI,PL);drawSouthChart(ASI,PL);
-  drawShadbala();drawDashaWheel();
+  drawShadbala();buildDashaSections();drawMuhuratTimeline();
 }
 window.__pd=PD;
 
@@ -936,28 +1018,114 @@ function drawShadbala(){
   });
 }
 
-// ── DASHA WHEEL ───────────────────────────────────────────────────────────
+// ── DASHA ─────────────────────────────────────────────────────────────────
 const DLORDS=[{n:'Ketu',y:7,c:'#a03818',s:'☋'},{n:'Venus',y:20,c:'#b84ca0',s:'♀'},{n:'Sun',y:6,c:'#d4921e',s:'☀'},{n:'Moon',y:10,c:'#5ab8e8',s:'☽'},{n:'Mars',y:7,c:'#e03020',s:'♂'},{n:'Rahu',y:18,c:'#208048',s:'☊'},{n:'Jupiter',y:16,c:'#c89020',s:'♃'},{n:'Saturn',y:19,c:'#7868b8',s:'♄'},{n:'Mercury',y:17,c:'#28b870',s:'☿'}];
-function drawDashaWheel(){
-  const svg=cv('dashaSvg'),leg=cv('dashaLeg');if(!svg||!leg)return;
-  const ns='http://www.w3.org/2000/svg';svg.innerHTML='';leg.innerHTML='';
-  const CX=130,CY=130,ro=118,ri=52,dark=isDark();let angle=-90;
-  DLORDS.forEach(l=>{
-    const sw=l.y/120*360,a1=angle*Math.PI/180,a2=(angle+sw)*Math.PI/180,am=(angle+sw/2)*Math.PI/180,lg=sw>180?1:0;
-    const x1=CX+ro*Math.cos(a1),y1=CY+ro*Math.sin(a1),x2=CX+ro*Math.cos(a2),y2=CY+ro*Math.sin(a2);
-    const x3=CX+ri*Math.cos(a2),y3=CY+ri*Math.sin(a2),x4=CX+ri*Math.cos(a1),y4=CY+ri*Math.sin(a1);
-    const p=document.createElementNS(ns,'path');
-    p.setAttribute('d',`M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4} Z`);
-    p.setAttribute('fill',l.c+'2a');p.setAttribute('stroke',l.c+'70');p.setAttribute('stroke-width','1.2');svg.appendChild(p);
-    if(sw>16){const rm=(ro+ri)/2,tx=document.createElementNS(ns,'text');tx.setAttribute('x',CX+rm*Math.cos(am));tx.setAttribute('y',CY+rm*Math.sin(am));tx.setAttribute('text-anchor','middle');tx.setAttribute('dominant-baseline','central');tx.setAttribute('fill',l.c);tx.setAttribute('font-size',sw>32?'15':'11');tx.textContent=l.s;svg.appendChild(tx);}
-    const pct=l.y/20*100;
-    leg.innerHTML+=`<div class="dl-row"><div class="dl-dot" style="background:${l.c}"></div><div class="dl-name" style="color:${l.c}">${l.s} ${l.n}</div><div class="dl-yr" style="color:${dark?'#a09070':'#5a4828'}">${l.y} yrs</div><div class="dl-bg"><div class="dl-fill" style="width:${pct}%;background:${l.c}60"></div></div></div>`;
-    angle+=sw;
+const DLORD_DETAIL=[
+  {n:'Ketu',   hi:'केतु',   s:'☋',y:7, c:'#a03818',nat:'Malefic', gem:"Cat's Eye (Lehsunia)",  sig:'Spirituality · Detachment · Past karma · Mysticism · Liberation',  rules:'Co-rules Scorpio'},
+  {n:'Venus',  hi:'शुक्र',  s:'♀',y:20,c:'#b84ca0',nat:'Benefic', gem:'Diamond / White Sapphire',sig:'Love · Beauty · Marriage · Arts · Luxury · Comforts · Vehicles',   rules:'Taurus & Libra'},
+  {n:'Sun',    hi:'सूर्य',  s:'☀',y:6, c:'#d4921e',nat:'Malefic', gem:'Ruby (Manik)',            sig:'Soul · Authority · Father · Government · Health · Vitality',        rules:'Leo (Simha)'},
+  {n:'Moon',   hi:'चंद्र',  s:'☽',y:10,c:'#5ab8e8',nat:'Benefic', gem:'Pearl / Moonstone',       sig:'Mind · Mother · Emotions · Fluids · Home · Nourishment · Travel',  rules:'Cancer (Karka)'},
+  {n:'Mars',   hi:'मंगल',   s:'♂',y:7, c:'#e03020',nat:'Malefic', gem:'Red Coral (Moonga)',      sig:'Energy · Courage · Land · Siblings · Surgery · Engineering',        rules:'Aries & Scorpio'},
+  {n:'Rahu',   hi:'राहु',   s:'☊',y:18,c:'#208048',nat:'Malefic', gem:'Hessonite (Gomed)',       sig:'Ambition · Foreign · Technology · Illusion · Sudden events',       rules:'Co-rules Aquarius'},
+  {n:'Jupiter',hi:'गुरु',   s:'♃',y:16,c:'#c89020',nat:'Benefic', gem:'Yellow Sapphire (Pukhraj)',sig:'Wisdom · Dharma · Children · Guru · Wealth · Higher education',   rules:'Sagittarius & Pisces'},
+  {n:'Saturn', hi:'शनि',    s:'♄',y:19,c:'#7868b8',nat:'Malefic', gem:'Blue Sapphire (Neelam)',  sig:'Karma · Discipline · Delays · Longevity · Servants · Renunciation',rules:'Capricorn & Aquarius'},
+  {n:'Mercury',hi:'बुध',    s:'☿',y:17,c:'#28b870',nat:'Benefic', gem:'Emerald (Panna)',         sig:'Intellect · Communication · Business · Trade · Siblings · Skin',   rules:'Gemini & Virgo'},
+];
+
+function buildDashaSections(){
+  // Horizontal timeline
+  const tl=document.getElementById('dashaTimeline');
+  if(tl){
+    tl.innerHTML='';
+    DLORDS.forEach(l=>{
+      const pct=(l.y/120*100).toFixed(3);
+      const lblFull=l.y>=14;const lblShort=l.y>=8;
+      tl.innerHTML+=`<div class="dt-seg" title="${l.n} (${l.y} yrs)" style="width:${pct}%;background:${l.c}dd;min-width:2px">
+        <div class="dt-lbl">${lblFull?l.s+' '+l.n+'<br>'+l.y+'y':lblShort?l.s+'<br>'+l.y+'y':''}</div>
+      </div>`;
+    });
+  }
+  // Lord cards
+  const cards=document.getElementById('dashaCards');
+  if(!cards)return;
+  cards.innerHTML='';
+  const dark=isDark(),lang=document.documentElement.dataset.lang;
+  DLORD_DETAIL.forEach(l=>{
+    const natCol=l.nat==='Benefic'?'#28b870':'#d83820';
+    const natBg=l.nat==='Benefic'?'rgba(40,184,112,.14)':'rgba(216,56,32,.14)';
+    cards.innerHTML+=`<div class="dl-card" style="border-top:3px solid ${l.c}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div class="dl-sym" style="color:${l.c}">${l.s}</div>
+        <div><div style="font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;color:${dark?'#a09070':'#5a4828'}">${l.y} yrs</div>
+          <div class="dl-nat" style="background:${natBg};color:${natCol}">${l.nat}</div>
+        </div>
+      </div>
+      <div class="dl-nm" style="color:${dark?'#ede4d0':'#14100a'}">${l.n}</div>
+      <div class="dl-hi" style="color:${dark?'#a09070':'#7a6040'}">${l.hi}</div>
+      <div class="dl-sig" style="color:${dark?'#a09070':'#5a4828'}">${l.sig}</div>
+      <div class="dl-gem" style="color:${dark?'#c8a84b':'#8a6010'}"><i class="ph ph-diamond" style="font-size:.85rem"></i> ${l.gem}</div>
+      <div style="font-size:.72rem;color:${dark?'#60503a':'#8a7450'};margin-top:5px">Rules: ${l.rules}</div>
+    </div>`;
   });
-  // center
-  const cc=document.createElementNS(ns,'circle');cc.setAttribute('cx',CX);cc.setAttribute('cy',CY);cc.setAttribute('r',ri-2);cc.setAttribute('fill',dark?'#07090f':'#f5f0e6');cc.setAttribute('stroke','rgba(200,168,75,.2)');cc.setAttribute('stroke-width','1');svg.appendChild(cc);
-  const t1=document.createElementNS(ns,'text');t1.setAttribute('x',CX);t1.setAttribute('y',CY-7);t1.setAttribute('text-anchor','middle');t1.setAttribute('fill','rgba(200,168,75,.75)');t1.setAttribute('font-size','14');t1.setAttribute('font-family','Playfair Display,serif');t1.textContent='120';svg.appendChild(t1);
-  const t2=document.createElementNS(ns,'text');t2.setAttribute('x',CX);t2.setAttribute('y',CY+9);t2.setAttribute('text-anchor','middle');t2.setAttribute('fill','rgba(200,168,75,.4)');t2.setAttribute('font-size','9');t2.textContent='years';svg.appendChild(t2);
+}
+function drawDashaWheel(){ buildDashaSections(); }
+
+// ── MUHURAT TIMELINE CANVAS ────────────────────────────────────────────────
+function drawMuhuratTimeline(){
+  const ctx=cx2d('muhCv');if(!ctx)return;
+  const W=900,H=72,dark=isDark();
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=dark?'#0c1220':'#f0ead8';ctx.fillRect(0,0,W,H);
+  const cho=PD.choghadiya;if(!cho||!cho.length)return;
+  const QCOL={'best':'#28b870','good':'#4a90c4','neutral':'#a08060','bad':'#d83820'};
+  const QNAMES={'Amrit':'#28b870','Shubh':'#4a90c4','Labh':'#6ab04c','Chal':'#a08060','Rog':'#d83820','Kaal':'#7060a8','Udveg':'#c05018'};
+  const segW=W/8,bH=44,bY=(H-bH)/2;
+  // Draw 8 segments
+  cho.forEach((c,i)=>{
+    const x=i*segW;
+    const col=QNAMES[c.name]||'#888';
+    ctx.fillStyle=col+(dark?'44':'33');ctx.fillRect(x,bY,segW,bH);
+    ctx.strokeStyle=col+'60';ctx.lineWidth=1;ctx.strokeRect(x,bY,segW,bH);
+    // segment label
+    ctx.fillStyle=col;ctx.font='bold 13px DM Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(c.name,x+segW/2,bY+bH/2-6);
+    ctx.font='10px DM Sans,sans-serif';ctx.fillStyle=dark?'rgba(255,255,255,.5)':'rgba(0,0,0,.45)';
+    ctx.fillText(c.start,x+segW/2,bY+bH/2+9);
+  });
+  // Time axis labels
+  ctx.font='10px DM Mono,monospace';ctx.fillStyle=dark?'rgba(255,255,255,.4)':'rgba(0,0,0,.35)';ctx.textAlign='center';
+  cho.forEach((c,i)=>{if(i%2===0)ctx.fillText(c.start,i*segW+2,bY-4);});
+  ctx.textAlign='right';ctx.fillText(cho[7].end,W-2,bY-4);
+  // Highlight Rahu Kaal
+  const rk=PD.rahuKaal;
+  if(rk&&rk.startHr&&rk.endHr){
+    const rStart=cho[0].startHr,rEnd=cho[7].endHr,dayLen=rEnd-rStart;
+    const rx=((rk.startHr-rStart)/dayLen)*W,rw=((rk.endHr-rk.startHr)/dayLen)*W;
+    ctx.fillStyle='rgba(216,56,32,.18)';ctx.fillRect(rx,0,rw,H);
+    ctx.strokeStyle='#d83820';ctx.lineWidth=2;ctx.strokeRect(rx,0,rw,H);
+    ctx.fillStyle='#d83820';ctx.font='bold 11px DM Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('Rahu Kaal',rx+rw/2,4);
+  }
+  // Highlight Abhijit
+  const ab=PD.abhijit;
+  if(ab&&ab.startHr&&ab.endHr){
+    const rStart=cho[0].startHr,rEnd=cho[7].endHr,dayLen=rEnd-rStart;
+    const ax=((ab.startHr-rStart)/dayLen)*W,aw=((ab.endHr-ab.startHr)/dayLen)*W;
+    ctx.fillStyle='rgba(40,184,112,.18)';ctx.fillRect(ax,0,aw,H);
+    ctx.strokeStyle='#28b870';ctx.lineWidth=2;ctx.strokeRect(ax,0,aw,H);
+    ctx.fillStyle='#28b870';ctx.font='bold 11px DM Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('Abhijit ✦',ax+aw/2,H-4);
+  }
+  // Current time marker
+  const now=new Date(),nH=now.getHours()+now.getMinutes()/60;
+  const rStart=cho[0].startHr,rEnd=cho[7].endHr;
+  if(nH>=rStart&&nH<=rEnd){
+    const nx=((nH-rStart)/(rEnd-rStart))*W;
+    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2;
+    ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(nx,0);ctx.lineTo(nx,H);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='bold 9px DM Mono,monospace';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('Now',nx,2);
+  }
 }
 
 // ── DAY NAVIGATION ────────────────────────────────────────────────────────
