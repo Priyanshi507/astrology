@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AstroController;
 use App\Http\Controllers\LandingController;
 
-Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/',               [LandingController::class, 'index'])->name('landing');
+Route::get('/panchanga-data', [LandingController::class, 'panchangaData'])->name('panchanga.data');
 
 Route::prefix('astro')->group(function () {
     Route::get('/',           [AstroController::class, 'index'])->name('astro.index');
