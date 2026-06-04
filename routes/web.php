@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AstroController;
+use App\Http\Controllers\LandingController;
 
-Route::get('/', [AstroController::class, 'index'])->name('astro.index');
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::prefix('astro')->group(function () {
     Route::get('/',           [AstroController::class, 'index'])->name('astro.index');
