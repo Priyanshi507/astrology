@@ -41,8 +41,33 @@
 </div>
 
 <div id="gocharPanel" style="display:none">
-  <div class="sec-lbl">♆ गोचर में राशियों का फल — Planetary Transit Results</div>
+  <div class="sec-lbl">♆ गोचर फल — Dynamic Planetary Transit (Gochar)</div>
+
+  {{-- Controls --}}
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--panel);border-radius:16px;padding:14px 18px;margin-bottom:18px">
+    {{-- Mode toggle --}}
+    <div style="display:inline-flex;background:var(--card);border:1.5px solid var(--sky-pale);border-radius:30px;padding:3px">
+      <button id="goMode_date"  class="go-mode-btn" onclick="setGoMode('date')"  style="border:none;background:var(--sky);color:#fff;border-radius:24px;padding:7px 16px;cursor:pointer;font-weight:700;font-size:.82rem">Date</button>
+      <button id="goMode_month" class="go-mode-btn" onclick="setGoMode('month')" style="border:none;background:transparent;color:var(--text-mid);border-radius:24px;padding:7px 16px;cursor:pointer;font-weight:700;font-size:.82rem">Month</button>
+      <button id="goMode_year"  class="go-mode-btn" onclick="setGoMode('year')"  style="border:none;background:transparent;color:var(--text-mid);border-radius:24px;padding:7px 16px;cursor:pointer;font-weight:700;font-size:.82rem">Year</button>
+    </div>
+
+    {{-- Inputs (shown per mode) --}}
+    <input type="date"  id="goDate"  onchange="gocharFetch()" style="padding:8px 12px;border:1.5px solid var(--sky-pale);border-radius:10px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem">
+    <input type="month" id="goMonth" onchange="gocharFetch()" style="display:none;padding:8px 12px;border:1.5px solid var(--sky-pale);border-radius:10px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem">
+    <input type="number" id="goYear" min="1900" max="2100" onchange="gocharFetch()" placeholder="Year" style="display:none;width:96px;padding:8px 12px;border:1.5px solid var(--sky-pale);border-radius:10px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem">
+
+    {{-- Prev / Next --}}
+    <div style="display:inline-flex;gap:6px">
+      <button onclick="goShift(-1)" title="Previous" style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--sky-pale);background:var(--card);color:var(--text-mid);cursor:pointer;font-size:1rem">‹</button>
+      <button onclick="goShift(1)"  title="Next"     style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--sky-pale);background:var(--card);color:var(--text-mid);cursor:pointer;font-size:1rem">›</button>
+    </div>
+
+    {{-- PDF --}}
+    <button onclick="downloadGocharPDF()" style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1d4e6f,#0f3450);color:#fff;border:none;border-radius:30px;padding:9px 18px;cursor:pointer;font-weight:700;font-size:.84rem">⬇ Download PDF</button>
+  </div>
+
   <div id="gocharContent" style="font-family:'DM Sans',sans-serif">
-    <div style="text-align:center;padding:40px;color:var(--text-lt);font-style:italic">✦ Calculate your chart above to see the Gochar (transit) results for all 12 rashis</div>
+    <div style="text-align:center;padding:40px;color:var(--text-lt);font-style:italic">✦ Calculate your chart above, then open this tab to see the dynamic Gochar (transit) results</div>
   </div>
 </div>

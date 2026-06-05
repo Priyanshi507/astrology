@@ -28,4 +28,5 @@
 @section('scripts')
 @include('partials._js_main')
 @include('partials._js_festival')
+@include('partials._js_gochar')
 @endsection

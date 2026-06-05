@@ -9,6 +9,7 @@ use App\Features\ChartRendering\ShodashvargaCalculator;
 use App\Features\ChartRendering\VargaChartRenderer;
 use App\Features\Planetary\ShadBalaCalculator;
 use App\Features\Planetary\GocharCalculator;
+use App\Features\Planetary\TransitCalculator;
 use App\Features\Dasha\VimshottariDashaCalculator;
 use App\Features\Festival\HinduFestivalCalculator;
 use App\Features\Festival\TodayPanelService;
@@ -116,28 +117,6 @@ $vimshottari = VimshottariDashaCalculator::calculate(
 );
 $dashaHtml = VimshottariDashaCalculator::renderHtml($vimshottari);
 
-// ── Gochar (transit) Phal — current transits vs natal Moon sign (BPHS) ──
-$natalMoonSign = (int)floor($moonSider / 30.0);
-$nowDt   = new \DateTime('now', new \DateTimeZone('Asia/Kolkata'));
-$tResult = AstroCalculator::calculate(
-    (int)$nowDt->format('Y'), (int)$nowDt->format('n'), (int)$nowDt->format('j'),
-    12, 0, $utcOff, $lat, $lon
-);
-$tAyan   = $tResult['ayan'];
-$tSigns  = AstroCalculator::getVedicSigns();
-$transit = [];
-foreach ($tResult['planets'] as $pid => $pd) {
-    $tSider          = fmod(fmod($pd['trop'] - $tAyan, 360) + 360, 360);
-    $tSignIdx        = (int)floor($tSider / 30.0);
-    $transit[$pid]   = [
-        'sign'     => $tSignIdx,
-        'signName' => $tSigns[$tSignIdx],
-        'retro'    => $pd['retro'],
-    ];
-}
-$gocharData = GocharCalculator::calculate($natalMoonSign, $transit);
-$gocharHtml = GocharCalculator::renderHtml($gocharData);
-
         return response()->json([
             // ── D1 Chart (Rashi / birth chart) ──────────────────
             'chartHtml'         => $chartHtml,
@@ -197,8 +176,77 @@ $gocharHtml = GocharCalculator::renderHtml($gocharData);
             'ascTrop' => $ascTrop,
             'shadBalaHtml' => $shadBalaHtml,
             'dashaHtml'    => $dashaHtml,
-            'gocharHtml'   => $gocharHtml,
         ]);
+    }
+
+    // ── POST /astro/gochar — dynamic transit (date / month / year) ──────────
+    public function gochar(Request $request)
+    {
+        $request->validate([
+            'date'      => 'required|date_format:Y-m-d',   // natal birth date
+            'time'      => 'required|date_format:H:i',
+            'utcOffset' => 'required|numeric|min:-12|max:14',
+            'lat'       => 'required|numeric|min:-90|max:90',
+            'lon'       => 'required|numeric|min:-180|max:180',
+            'mode'      => 'required|string|in:date,month,year',
+            'target'    => 'required|date_format:Y-m-d',    // target/anchor date
+        ]);
+
+        [$nyr, $nmo, $ndy] = array_map('intval', explode('-', $request->date));
+        [$nhr, $nmn]       = array_map('intval', explode(':', $request->time));
+        $utcOff = (float)$request->utcOffset;
+        $lat    = (float)$request->lat;
+        $lon    = (float)$request->lon;
+        $mode   = $request->mode;
+        [$tyr, $tmo, $tdy] = array_map('intval', explode('-', $request->target));
+
+        // ── Natal chart → Moon sign + natal planet signs (for aspects) ──
+        $natal     = AstroCalculator::calculate($nyr, $nmo, $ndy, $nhr, $nmn, $utcOff, $lat, $lon);
+        $nAyan     = $natal['ayan'];
+        $natalMoon = (int)floor(fmod(fmod($natal['planets']['moon']['trop'] - $nAyan, 360) + 360, 360) / 30.0);
+        $natalSigns = [];
+        foreach ($natal['planets'] as $pid => $pd) {
+            $sd = fmod(fmod($pd['trop'] - $nAyan, 360) + 360, 360);
+            $natalSigns[$pid] = (int)floor($sd / 30.0);
+        }
+
+        if ($mode === 'date') {
+            $jd      = TransitCalculator::localJd($tyr, $tmo, $tdy, 12.0, $utcOff);
+            $details = TransitCalculator::planetDetails($jd, $utcOff);
+            $aspects = TransitCalculator::natalAspects($details, $natalSigns);
+
+            $tSigns  = AstroCalculator::getVedicSigns();
+            $transit = [];
+            foreach ($details as $pid => $d) {
+                $transit[$pid] = ['sign' => $d['signIdx'], 'signName' => $tSigns[$d['signIdx']], 'retro' => $d['retro']];
+            }
+            $gocharData = GocharCalculator::calculate($natalMoon, $transit);
+
+            $label = sprintf('%02d %s %d', $tdy, ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][$tmo], $tyr);
+            $html  = TransitCalculator::renderDate($details, $aspects, $label, $natalMoon, $utcOff)
+                   . '<div style="margin-top:8px">' . GocharCalculator::renderHtml($gocharData) . '</div>';
+
+            return response()->json(['html' => $html, 'label' => $label]);
+        }
+
+        if ($mode === 'month') {
+            $lastDay = (int)(new \DateTime("$tyr-$tmo-01"))->format('t');
+            $events  = TransitCalculator::rangeEvents(
+                $tyr, $tmo, 1, $tyr, $tmo, $lastDay, $utcOff,
+                ['sun','moon','mars','mercury','jupiter','venus','saturn','rahu','ketu']
+            );
+            $label = ['','January','February','March','April','May','June','July','August','September','October','November','December'][$tmo] . ' ' . $tyr;
+            $html  = TransitCalculator::renderCalendar($events, 'Transit Calendar — ' . $label, $utcOff, false);
+            return response()->json(['html' => $html, 'label' => $label]);
+        }
+
+        // year
+        $events = TransitCalculator::rangeEvents(
+            $tyr, 1, 1, $tyr, 12, 31, $utcOff,
+            ['sun','mars','mercury','venus','jupiter','saturn','rahu','ketu'] // Moon excluded (changes every ~2.25 days)
+        );
+        $html = TransitCalculator::renderCalendar($events, 'Yearly Transit Calendar — ' . $tyr, $utcOff, true);
+        return response()->json(['html' => $html, 'label' => (string)$tyr]);
     }
 
     public function tarabalMurti(Request $request): \Illuminate\Http\JsonResponse

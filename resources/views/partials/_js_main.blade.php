@@ -1323,10 +1323,7 @@ if (d.shadBalaHtml) {
   const sc = document.getElementById('shadbalaContent');
   if (sc) sc.innerHTML = d.shadBalaHtml;
 }
-if (d.gocharHtml) {
-  const gc = document.getElementById('gocharContent');
-  if (gc) gc.innerHTML = d.gocharHtml;
-}
+_goInit = false;  // allow the Gochar panel to re-init for this chart
  
  
 
@@ -1796,6 +1793,9 @@ if (pid === 'murti') {
   }
   if (pid === 'muhrat' && _masaLat !== null) {
     initMuhratPanel();
+  }
+  if (pid === 'gochar' && _masaLat !== null) {
+    initGocharPanel();
   }
 
   const pib=document.getElementById('pib');
