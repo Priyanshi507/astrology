@@ -39,3 +39,10 @@
   <div id="shadbalaContent" style="font-family:'DM Sans',sans-serif">
   </div>
 </div>
+
+<div id="gocharPanel" style="display:none">
+  <div class="sec-lbl">♆ गोचर में राशियों का फल — Planetary Transit Results</div>
+  <div id="gocharContent" style="font-family:'DM Sans',sans-serif">
+    <div style="text-align:center;padding:40px;color:var(--text-lt);font-style:italic">✦ Calculate your chart above to see the Gochar (transit) results for all 12 rashis</div>
+  </div>
+</div>

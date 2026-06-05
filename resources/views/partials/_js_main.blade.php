@@ -1323,6 +1323,10 @@ if (d.shadBalaHtml) {
   const sc = document.getElementById('shadbalaContent');
   if (sc) sc.innerHTML = d.shadBalaHtml;
 }
+if (d.gocharHtml) {
+  const gc = document.getElementById('gocharContent');
+  if (gc) gc.innerHTML = d.gocharHtml;
+}
  
  
 
@@ -1735,7 +1739,7 @@ if (festYrEl && !festYrEl.value) festYrEl.value = y;
 
 
 // ── Tab navigation ─────────────────────────────────────────────────
-const ALL_TABS=['today','chart','varga','lagna','tithi','masa','dasha','shadbala','tarabal','festival','muhrat','sun','moon','mercury','venus','mars','jupiter','saturn','rahu','ketu'];
+const ALL_TABS=['today','chart','varga','lagna','tithi','masa','dasha','shadbala','tarabal','gochar','festival','muhrat','sun','moon','mercury','venus','mars','jupiter','saturn','rahu','ketu'];
 const TAB_CLASS={
   chart:'act-chart',varga:'act-varga',lagna:'act-lagna',tithi:'act-tithi',masa:'act-masa',
   sun:'act-sun',moon:'act-moon',mercury:'act-merc',venus:'act-venus',
@@ -1747,6 +1751,7 @@ const TAB_CLASS={
   today:  'act-today', 
   tarabal:  'act-varga',
   murti:    'act-varga',
+  gochar:   'act-tithi',
 };
 const PLANET_SYMS={sun:'☀',moon:'☽',mercury:'☿',venus:'♀',mars:'♂',jupiter:'♃',saturn:'♄',rahu:'☊',ketu:'☋'};
 

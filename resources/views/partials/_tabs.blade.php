@@ -20,7 +20,8 @@
         <button class="tab-btn" id="tab_dasha"   onclick="showTab('dasha')"  ><span class="tab-sym">⏳</span> Dasha<span class="tab-k">D</span></button>
         <button class="tab-btn" id="tab_shadbala" onclick="showTab('shadbala')"><span class="tab-sym">⚖</span> Shadbala<span class="tab-k">B</span></button>
         <button class="tab-btn" id="tab_tarabal" onclick="showTab('tarabal')"><span class="tab-sym">⭐</span> तारबल<span class="tab-k">Y</span></button>
-        
+        <button class="tab-btn" id="tab_gochar" onclick="showTab('gochar')"><span class="tab-sym">♆</span> गोचर फल<span class="tab-k">N</span></button>
+
       </div>
     </div>
     <div class="tab-row tab-row-planets">

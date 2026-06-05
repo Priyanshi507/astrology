@@ -8,6 +8,7 @@ use App\Features\ChartRendering\AstroChartRenderer;
 use App\Features\ChartRendering\ShodashvargaCalculator;
 use App\Features\ChartRendering\VargaChartRenderer;
 use App\Features\Planetary\ShadBalaCalculator;
+use App\Features\Planetary\GocharCalculator;
 use App\Features\Dasha\VimshottariDashaCalculator;
 use App\Features\Festival\HinduFestivalCalculator;
 use App\Features\Festival\TodayPanelService;
@@ -115,6 +116,28 @@ $vimshottari = VimshottariDashaCalculator::calculate(
 );
 $dashaHtml = VimshottariDashaCalculator::renderHtml($vimshottari);
 
+// ── Gochar (transit) Phal — current transits vs natal Moon sign (BPHS) ──
+$natalMoonSign = (int)floor($moonSider / 30.0);
+$nowDt   = new \DateTime('now', new \DateTimeZone('Asia/Kolkata'));
+$tResult = AstroCalculator::calculate(
+    (int)$nowDt->format('Y'), (int)$nowDt->format('n'), (int)$nowDt->format('j'),
+    12, 0, $utcOff, $lat, $lon
+);
+$tAyan   = $tResult['ayan'];
+$tSigns  = AstroCalculator::getVedicSigns();
+$transit = [];
+foreach ($tResult['planets'] as $pid => $pd) {
+    $tSider          = fmod(fmod($pd['trop'] - $tAyan, 360) + 360, 360);
+    $tSignIdx        = (int)floor($tSider / 30.0);
+    $transit[$pid]   = [
+        'sign'     => $tSignIdx,
+        'signName' => $tSigns[$tSignIdx],
+        'retro'    => $pd['retro'],
+    ];
+}
+$gocharData = GocharCalculator::calculate($natalMoonSign, $transit);
+$gocharHtml = GocharCalculator::renderHtml($gocharData);
+
         return response()->json([
             // ── D1 Chart (Rashi / birth chart) ──────────────────
             'chartHtml'         => $chartHtml,
@@ -174,6 +197,7 @@ $dashaHtml = VimshottariDashaCalculator::renderHtml($vimshottari);
             'ascTrop' => $ascTrop,
             'shadBalaHtml' => $shadBalaHtml,
             'dashaHtml'    => $dashaHtml,
+            'gocharHtml'   => $gocharHtml,
         ]);
     }
 
