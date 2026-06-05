@@ -739,73 +739,97 @@ class AstroCalculator
         ];
     }
 
+    /**
+     * Precise JD of the new moon (Sun–Moon conjunction) that began the lunation
+     * containing $jdRef, whose Moon–Sun elongation is $elong (0–360°).
+     * Newton refinement on the true elongation (≈12.19°/day relative motion)
+     * removes the ~1-day error of a linear estimate near a Sankranti boundary.
+     */
+    public static function newMoonBefore(float $jdRef, float $elong): float
+    {
+        $nm = $jdRef - $elong / 12.19;
+        for ($k = 0; $k < 5; $k++) {
+            $e = self::n360(self::moonLongitude($nm) - self::sunLongitude($nm));
+            if ($e > 180.0) $e -= 360.0;
+            $nm -= $e / 12.19;
+        }
+        return $nm;
+    }
+
+    /**
+     * Purnimanta (North-Indian) lunar-month index (0 = Chaitra) for a date.
+     * Month is named from the Sun's sidereal sign at the lunation's new moon;
+     * Krishna paksha takes the next month's name (Purnimanta convention).
+     */
+    public static function purnimantaMasaIdx(float $jdRef, float $elong, string $paksha): int
+    {
+        $nm      = self::newMoonBefore($jdRef, $elong);
+        $sunSign = (int)floor(self::n360(self::sunLongitude($nm) - self::lahiriAyanamsa($nm)) / 30.0);
+        $amanta  = ($sunSign + 1) % 12;                       // Meena → Chaitra
+        return ($paksha === 'Krishna') ? ($amanta + 1) % 12 : $amanta;
+    }
+
      public static function getEkadashiYear(
     int $year, float $lat, float $lon, float $utcOff
 ): array {
     $ekadashis = [];
-    $ekNames   = self::getEkadashiNames(); // see below
+    $ekNames   = self::getEkadashiNames();
 
-    // Scan all 12 Vedic months (civil months 3..2 next year)
-    $civilMonths = [3,4,5,6,7,8,9,10,11,12,1,2];
-    $civYears    = array_merge(array_fill(0,10,$year), [$year+1,$year+1]);
+    // Scan every civil day of the year. An Ekadashi vrat day is one where the
+    // Ekadashi tithi (11) prevails at sunrise. The lunar month is named in the
+    // Purnimanta (North-Indian) convention from the Sun's sidereal sign at the
+    // NEW MOON that began the lunation — so names never drift across a Sankranti.
+    $start    = new \DateTime("$year-01-01");
+    $lastKey  = '';
+    $lastJd   = -1e9;
 
-    foreach ($civilMonths as $idx => $civMon) {
-        $civYear = ($civMon <= 2) ? $year + 1 : $year;
-        $daysInMonth = (int)(new \DateTime("$civYear-$civMon-01"))->format('t');
+    for ($i = 0; $i < 366; $i++) {
+        $dt = clone $start; $dt->modify("+{$i} days");
+        if ((int)$dt->format('Y') !== $year) break;
+        $y = (int)$dt->format('Y'); $m = (int)$dt->format('n'); $d = (int)$dt->format('j');
 
-        foreach (['Shukla','Krishna'] as $paksha) {
-            for ($d = 1; $d <= $daysInMonth; $d++) {
-                $ss = self::sunriseSunset($civYear, $civMon, $d, $lat, $lon, $utcOff);
-                $jdRef = ($ss['rise'] !== null && !$ss['polar'])
-                    ? self::julianDay($civYear, $civMon, $d, $ss['rise'] - $utcOff)
-                    : self::julianDay($civYear, $civMon, $d, 12.0 - $utcOff);
+        $ss     = self::sunriseSunset($y, $m, $d, $lat, $lon, $utcOff);
+        $riseHr = (!$ss['polar'] && $ss['rise'] !== null) ? $ss['rise'] : 6.0;
+        $jdRef  = self::julianDay($y, $m, $d, $riseHr - $utcOff);
 
-                $tk = self::computeTithiKarana($jdRef);
-                if ($tk['tithi']['paksha'] !== $paksha || $tk['tithi']['num'] !== 11) continue;
+        $tk = self::computeTithiKarana($jdRef);
+        if ($tk['tithi']['num'] !== 11) continue;
+        $paksha = $tk['tithi']['paksha'];
 
-                $ayan   = self::lahiriAyanamsa($jdRef);
-                $pancha = self::computePanchanga($jdRef, $ayan, $civYear, $civMon, $d, $utcOff);
+        // Purnimanta month from the precise new-moon Sun sign
+        $purnimIdx = self::purnimantaMasaIdx($jdRef, $tk['elong'], $paksha);
+        $vedMonIdx = $purnimIdx + 1;
+        $key       = $paksha . '_' . $vedMonIdx;
 
-                // Find exact start / end times (same bisection as in buildMasaData)
-                $tithiEnd = self::findNextCrossing(
-                    $jdRef, $utcOff, 12.0,
-                    [$civYear, $civMon, $d, 'elong'], 2.0
-                );
+        // Skip the second sunrise of a tithi-Vriddhi (Ekadashi on two sunrises)
+        if ($key === $lastKey && ($jdRef - $lastJd) < 3.0) continue;
+        $lastKey = $key; $lastJd = $jdRef;
 
-                $vedMonIdx = $idx + 1; // 1-based Vedic month
-                $key       = $paksha . '_' . $vedMonIdx;
-                $ekInfo    = $ekNames[$key] ?? ['name'=>'Ekadashi','nameHi'=>'एकादशी'];
+        $ayan     = self::lahiriAyanamsa($jdRef);
+        $pancha   = self::computePanchanga($jdRef, $ayan, $y, $m, $d, $utcOff);
+        $tithiEnd = self::findNextCrossing($jdRef, $utcOff, 12.0, [$y, $m, $d, 'elong'], 2.0);
+        $ekInfo   = $ekNames[$key] ?? ['name'=>'Ekadashi','nameHi'=>'एकादशी'];
 
-                $ekadashis[] = [
-                    'name'       => $ekInfo['name'],
-                    'nameHi'     => $ekInfo['nameHi'],
-                    'paksha'     => $paksha,
-                    'vedMonth'   => self::MASA_NAMES[$vedMonIdx - 1],
-                    'vedMonthNum'=> $vedMonIdx,
-                    'date'       => sprintf('%04d-%02d-%02d', $civYear, $civMon, $d),
-                    'startTime'  => $ss['rise'] !== null
-                                    ? self::decToHMS($ss['rise'])
-                                    : '06:00',
-                    'endTime'    => $tithiEnd
-                                    ? self::fmtSamaptiLocal($tithiEnd, $ss['rise'])
-                                    : '—',
-                    'tithi'      => 11,
-                    'tithiLord'  => 'Vishnu',
-                    'yoga'       => $pancha['yoga']['n'],
-                    'nakshatra'  => $pancha['moonNak']['n'],
-                    'nakLord'    => $pancha['moonNak']['l'],
-                    'significance'=> $ekInfo['significance'] ?? '',
-                    'rituals'    => $ekInfo['rituals']       ?? [],
-                    'mantra'     => $ekInfo['mantra']        ?? 'ॐ नमो भगवते वासुदेवाय',
-                    'auspTime'   => $ekInfo['auspTime']      ?? 'Sunrise to Dvadashi sunrise',
-                ];
-                break; // found Ekadashi for this paksha in this month
-            }
-        }
+        $ekadashis[] = [
+            'name'        => $ekInfo['name'],
+            'nameHi'      => $ekInfo['nameHi'],
+            'paksha'      => $paksha,
+            'vedMonth'    => self::MASA_NAMES[$purnimIdx],
+            'vedMonthNum' => $vedMonIdx,
+            'date'        => sprintf('%04d-%02d-%02d', $y, $m, $d),
+            'startTime'   => $ss['rise'] !== null ? self::decToHMS($ss['rise']) : '06:00',
+            'endTime'     => $tithiEnd ? self::fmtSamaptiLocal($tithiEnd, $ss['rise']) : '—',
+            'tithi'       => 11,
+            'tithiLord'   => 'Vishnu',
+            'yoga'        => $pancha['yoga']['n'],
+            'nakshatra'   => $pancha['moonNak']['n'],
+            'nakLord'     => $pancha['moonNak']['l'],
+            'significance'=> $ekInfo['significance'] ?? '',
+            'rituals'     => $ekInfo['rituals']       ?? [],
+            'mantra'      => $ekInfo['mantra']        ?? 'ॐ नमो भगवते वासुदेवाय',
+            'auspTime'    => $ekInfo['auspTime']      ?? 'Sunrise to Dvadashi sunrise',
+        ];
     }
-
-    // Sort chronologically
-    usort($ekadashis, fn($a,$b) => strcmp($a['date'], $b['date']));
 
     return $ekadashis;
 }

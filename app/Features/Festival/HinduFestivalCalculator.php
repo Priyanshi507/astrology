@@ -83,8 +83,17 @@ class HinduFestivalCalculator
 
             $sunSider    = $result['planets']['sun']['sider'] ?? 0;
             $curSunSign  = (int)floor($sunSider / 30);
-            $masaIdx     = self::MASA_FROM_SUN_SIGN[$curSunSign];
-            $masaName    = AstroCalculator::MASA_NAMES[$masaIdx] ?? 'Unknown';
+
+            // ── Lunar month (Purnimanta · North-Indian) ──────────────────────
+            // Named from the Sun's sidereal sign at the NEW MOON that began this
+            // lunation (invariant for the whole month) — not the sun-sign on the
+            // day, which drifts across the Sankranti and mis-named festivals by
+            // a whole month. Shukla paksha keeps the amanta month; Krishna paksha
+            // takes the next month's name (Purnimanta convention).
+            $elong     = $result['tk']['elong'] ?? 0.0;
+            $jdRef     = $result['jd'] ?? AstroCalculator::julianDay($yr, $mo, $dy, 6.0 - $utcOff);
+            $masaIdx   = AstroCalculator::purnimantaMasaIdx($jdRef, $elong, $paksha);
+            $masaName  = AstroCalculator::MASA_NAMES[$masaIdx] ?? 'Unknown';
 
             $moonSider = $result['planets']['moon']['sider'] ?? 0;
             $nakIdx    = (int)floor($moonSider / (360/27));
@@ -336,7 +345,9 @@ class HinduFestivalCalculator
 
                 $useDate = in_array(14, $skippedTithis) ? $prevDateStr : $dateStr;
                 $useMasa = in_array(14, $skippedTithis) ? $prevMasaName : $masaName;
-                $isMaha  = ($useMasa === 'Phalguna' || $useMasa === 'Magha');
+                // Maha Shivratri = Phalguna Krishna Chaturdashi (Purnimanta).
+                // Magha Krishna 14 is the monthly Masik Shivratri, not Maha.
+                $isMaha  = ($useMasa === 'Phalguna');
 
                 $festivals[] = [
                     'date'         => $useDate,
