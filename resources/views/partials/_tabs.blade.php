@@ -20,7 +20,6 @@
         <button class="tab-btn" id="tab_dasha"   onclick="showTab('dasha')"  ><span class="tab-sym">⏳</span> Dasha<span class="tab-k">D</span></button>
         <button class="tab-btn" id="tab_shadbala" onclick="showTab('shadbala')"><span class="tab-sym">⚖</span> Shadbala<span class="tab-k">B</span></button>
         <button class="tab-btn" id="tab_tarabal" onclick="showTab('tarabal')"><span class="tab-sym">⭐</span> तारबल<span class="tab-k">Y</span></button>
-        <button class="tab-btn" id="tab_gochar" onclick="showTab('gochar')"><span class="tab-sym">♆</span> गोचर फल<span class="tab-k">N</span></button>
 
       </div>
     </div>
@@ -36,6 +35,7 @@
         <button class="tab-btn" id="tab_saturn"  onclick="showTab('saturn')" ><span class="tab-sym">♄</span> Saturn<span class="tab-k">K</span></button>
         <button class="tab-btn" id="tab_rahu"    onclick="showTab('rahu')"   ><span class="tab-sym">☊</span> Rahu<span class="tab-k">R</span></button>
         <button class="tab-btn" id="tab_ketu"    onclick="showTab('ketu')"   ><span class="tab-sym">☋</span> Ketu<span class="tab-k">U</span></button>
+        <button class="tab-btn" id="tab_gochar"  onclick="showTab('gochar')" ><span class="tab-sym">♆</span> गोचर फल<span class="tab-k">N</span></button>
       </div>
     </div>
   </div>
