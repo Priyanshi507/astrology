@@ -756,6 +756,18 @@ class AstroCalculator
         return $nm;
     }
 
+    /** Precise JD of the next new moon AFTER $nm. */
+    public static function newMoonAfter(float $nm): float
+    {
+        $t = $nm + 29.53;
+        for ($k = 0; $k < 6; $k++) {
+            $e = self::n360(self::moonLongitude($t) - self::sunLongitude($t));
+            if ($e > 180.0) $e -= 360.0;
+            $t -= $e / 12.19;
+        }
+        return $t;
+    }
+
     /**
      * Purnimanta (North-Indian) lunar-month index (0 = Chaitra) for a date.
      * Month is named from the Sun's sidereal sign at the lunation's new moon;
@@ -763,10 +775,25 @@ class AstroCalculator
      */
     public static function purnimantaMasaIdx(float $jdRef, float $elong, string $paksha): int
     {
+        return self::lunarMonthInfo($jdRef, $elong, $paksha)['masaIdx'];
+    }
+
+    /**
+     * Full lunar-month info: Purnimanta month index + Adhik Maas flag.
+     * A lunation (new moon → new moon) with NO solar Sankranti inside it is an
+     * Adhika (leap) month — the Sun stays in the same sidereal sign across both
+     * bounding new moons.
+     */
+    public static function lunarMonthInfo(float $jdRef, float $elong, string $paksha): array
+    {
         $nm      = self::newMoonBefore($jdRef, $elong);
-        $sunSign = (int)floor(self::n360(self::sunLongitude($nm) - self::lahiriAyanamsa($nm)) / 30.0);
-        $amanta  = ($sunSign + 1) % 12;                       // Meena → Chaitra
-        return ($paksha === 'Krishna') ? ($amanta + 1) % 12 : $amanta;
+        $next    = self::newMoonAfter($nm);
+        $signNm  = (int)floor(self::n360(self::sunLongitude($nm)   - self::lahiriAyanamsa($nm))   / 30.0);
+        $signNxt = (int)floor(self::n360(self::sunLongitude($next) - self::lahiriAyanamsa($next)) / 30.0);
+        $adhik   = ($signNm === $signNxt);                    // no Sankranti in this lunation
+        $amanta  = ($signNm + 1) % 12;                        // Meena → Chaitra
+        $purnim  = ($paksha === 'Krishna') ? ($amanta + 1) % 12 : $amanta;
+        return ['masaIdx' => $purnim, 'amantaIdx' => $amanta, 'adhik' => $adhik];
     }
 
      public static function getEkadashiYear(
@@ -796,10 +823,12 @@ class AstroCalculator
         if ($tk['tithi']['num'] !== 11) continue;
         $paksha = $tk['tithi']['paksha'];
 
-        // Purnimanta month from the precise new-moon Sun sign
-        $purnimIdx = self::purnimantaMasaIdx($jdRef, $tk['elong'], $paksha);
+        // Purnimanta month + Adhik Maas (leap month) detection
+        $minfo     = self::lunarMonthInfo($jdRef, $tk['elong'], $paksha);
+        $purnimIdx = $minfo['masaIdx'];
+        $isAdhik   = $minfo['adhik'];
         $vedMonIdx = $purnimIdx + 1;
-        $key       = $paksha . '_' . $vedMonIdx;
+        $key       = ($isAdhik ? 'A_' : '') . $paksha . '_' . $vedMonIdx;
 
         // Skip the second sunrise of a tithi-Vriddhi (Ekadashi on two sunrises)
         if ($key === $lastKey && ($jdRef - $lastJd) < 3.0) continue;
@@ -808,13 +837,27 @@ class AstroCalculator
         $ayan     = self::lahiriAyanamsa($jdRef);
         $pancha   = self::computePanchanga($jdRef, $ayan, $y, $m, $d, $utcOff);
         $tithiEnd = self::findNextCrossing($jdRef, $utcOff, 12.0, [$y, $m, $d, 'elong'], 2.0);
-        $ekInfo   = $ekNames[$key] ?? ['name'=>'Ekadashi','nameHi'=>'एकादशी'];
+
+        if ($isAdhik) {
+            // Adhik Maas (Purushottam Maas) Ekadashis
+            $ekInfo = ($paksha === 'Shukla')
+                ? ['name'=>'Padmini Ekadashi', 'nameHi'=>'पद्मिनी एकादशी',
+                   'significance'=>'Shukla Ekadashi of Adhik Maas (Purushottam Maas) — exceptionally meritorious.',
+                   'rituals'=>['Observe full fast','Worship Purushottam (Vishnu)','Night vigil & kirtan'],
+                   'mantra'=>'ॐ नमो भगवते वासुदेवाय','auspTime'=>'Sunrise to Dvadashi sunrise']
+                : ['name'=>'Parama Ekadashi', 'nameHi'=>'परमा एकादशी',
+                   'significance'=>'Krishna Ekadashi of Adhik Maas (Purushottam Maas) — grants prosperity and liberation.',
+                   'rituals'=>['Observe full fast','Worship Vishnu','Donate generously'],
+                   'mantra'=>'ॐ नमो भगवते वासुदेवाय','auspTime'=>'Sunrise to Dvadashi sunrise'];
+        } else {
+            $ekInfo = $ekNames[$paksha . '_' . $vedMonIdx] ?? ['name'=>'Ekadashi','nameHi'=>'एकादशी'];
+        }
 
         $ekadashis[] = [
             'name'        => $ekInfo['name'],
             'nameHi'      => $ekInfo['nameHi'],
             'paksha'      => $paksha,
-            'vedMonth'    => self::MASA_NAMES[$purnimIdx],
+            'vedMonth'    => ($isAdhik ? 'Adhika ' : '') . self::MASA_NAMES[$purnimIdx],
             'vedMonthNum' => $vedMonIdx,
             'date'        => sprintf('%04d-%02d-%02d', $y, $m, $d),
             'startTime'   => $ss['rise'] !== null ? self::decToHMS($ss['rise']) : '06:00',

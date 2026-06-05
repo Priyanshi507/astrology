@@ -146,21 +146,22 @@ class HinduFestivalCalculator
 
                 switch ($useMasa) {
                     case 'Phalguna':
-                        $prevDt = (new \DateTime($useDate))->modify('-1 day');
-                        $festivals[] = ['date'=>$prevDt->format('Y-m-d'),'name'=>'Holika Dahan',
+                        // Holika Dahan is on the Phalguna Purnima day (Pradosh);
+                        // Holi / Dhulandi is the next day (Chaitra Krishna Pratipada).
+                        $holiDate = (new \DateTime($useDate))->modify('+1 day')->format('Y-m-d');
+                        $festivals[] = array_merge($base, ['name'=>'Holika Dahan',
                             'name_hi'=>'होलिका दहन','type'=>'festival','category'=>'festival',
-                            'tithi'=>'फाल्गुन पूर्णिमा संध्या','masa'=>$useMasa,
-                            'sunrise'=>$ssRise,'sunset'=>$ssSet,'icon'=>'🔥',
+                            'tithi'=>'फाल्गुन पूर्णिमा संध्या','masa'=>$useMasa,'icon'=>'🔥',
                             'significance'=>'होलिका दहन — प्रह्लाद की भक्ति की विजय। होलिका (दानव कन्या) का अग्नि में भस्म होना। B.V. Raman: उत्तरायण के वसंत अग्नि उत्सव का प्रतीक।',
                             'rituals'=>['होलिका का अलाव','3/7 बार परिक्रमा','नारियल और नई फसल अर्पण','नृसिंह कवच','भक्ति गीत'],
                             'mantra'=>'ॐ नमो भगवते नरसिंहाय नमः',
-                            'details'=>'होलिका दहन: हिरण्यकशिपु की बहन होलिका को अग्नि वरदान था, परंतु प्रह्लाद की भक्ति ने उसे बचाया। Phalguna Purnima की पूर्व संध्या।'];
-                        $festivals[] = array_merge($base, ['name'=>'Holi','name_hi'=>'होली',
+                            'details'=>'होलिका दहन: हिरण्यकशिपु की बहन होलिका को अग्नि वरदान था, परंतु प्रह्लाद की भक्ति ने उसे बचाया। फाल्गुन पूर्णिमा की संध्या (प्रदोष काल)।']);
+                        $festivals[] = array_merge($base, ['date'=>$holiDate,'name'=>'Holi','name_hi'=>'होली',
                             'type'=>'festival','category'=>'festival','icon'=>'🎨',
                             'significance'=>'रंगों का त्योहार — बुराई पर अच्छाई की विजय। वृंदावन में श्रीकृष्ण-गोपियों की रासलीला का उत्सव।',
                             'rituals'=>['प्राकृतिक गुलाल से खेलें','अबीर-गुलाल','मंदिर दर्शन','गुजिया-ठंडाई','क्षमा और मेलमिलाप'],
                             'mantra'=>'राधे कृष्ण राधे कृष्ण · होली खेले रघुवीरा अवध में',
-                            'details'=>'फाल्गुन पूर्णिमा पर होली। रंग वसंत के फूलों का प्रतीक। मथुरा-वृंदावन में लट्ठमार और फूलवाली होली।']);
+                            'details'=>'फाल्गुन पूर्णिमा के अगले दिन (चैत्र कृष्ण प्रतिपदा) होली खेली जाती है।']);
                         break;
                     case 'Chaitra':
                         $festivals[] = array_merge($base, ['name'=>'Hanuman Jayanti',
@@ -844,6 +845,25 @@ class HinduFestivalCalculator
         }
 
         usort($festivals, fn($a, $b) => $a['date'] <=> $b['date']);
+
+        // ── De-duplicate annual festivals across an Adhik Maas ───────────────
+        // In a leap-month year a month-specific annual festival (e.g. Ganga
+        // Dussehra = Jyeshtha Shukla 10) is triggered in BOTH the Adhika and the
+        // Nija month. Keep only the first occurrence for non-recurring festivals;
+        // monthly vrats (Pradosh, Chaturthi, Ekadashi, …) are left untouched.
+        $recurring = [
+            'ekadashi','pradosh','chaturthi','kalashtami','durgaashtami',
+            'masik_shivratri','sankranti','purnima','amavasya','shraddha',
+            'satyanarayan',
+        ];
+        $seen = [];
+        $festivals = array_values(array_filter($festivals, function ($f) use (&$seen, $recurring) {
+            if (in_array($f['category'] ?? '', $recurring, true)) return true;
+            $name = $f['name'] ?? '';
+            if (isset($seen[$name])) return false;
+            $seen[$name] = true;
+            return true;
+        }));
 
         return ['festivals'=>$festivals, 'count'=>count($festivals), 'year'=>$year];
     }
