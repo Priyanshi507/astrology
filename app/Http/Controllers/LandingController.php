@@ -141,8 +141,8 @@ class LandingController extends Controller
             ];
         }
 
-        // ── Rahu Kaal (which 1/8 part of the day is inauspicious) ──────
-        $rKParts = [0 => 8, 1 => 2, 2 => 7, 3 => 5, 4 => 6, 5 => 3, 6 => 4];
+        // ── Rahu Kaal — standard part (1–8) of the day per weekday ──────
+        $rKParts = [0 => 8, 1 => 2, 2 => 7, 3 => 5, 4 => 6, 5 => 4, 6 => 3];
         $rKPart  = $rKParts[$varaIdx] ?? 1;
         $rKStart = $riseHr + ($rKPart - 1) * ($setHr - $riseHr) / 8;
         $rKEnd   = $riseHr + $rKPart       * ($setHr - $riseHr) / 8;
@@ -152,8 +152,8 @@ class LandingController extends Controller
         $abStart   = $solarNoon - 24 / 60;
         $abEnd     = $solarNoon + 24 / 60;
 
-        // ── Yamghantam (inauspicious, shifts each weekday) ──────────────
-        $ygParts = [0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 8, 5 => 1, 6 => 2];
+        // ── Yamaganda Kaal — standard part per weekday ─────────────────
+        $ygParts = [0 => 5, 1 => 4, 2 => 3, 3 => 2, 4 => 1, 5 => 7, 6 => 6];
         $ygPart  = $ygParts[$varaIdx] ?? 1;
         $ygStart = $riseHr + ($ygPart - 1) * ($setHr - $riseHr) / 8;
         $ygEnd   = $riseHr + $ygPart       * ($setHr - $riseHr) / 8;

@@ -59,9 +59,11 @@ class MuhratCalculator
     private const YONI_SHATRU   = [[0,4],[1,13],[2,9],[3,12],[5,11],[6,14],[7,8],[10,14]];
 
     // ── वार अनुक्रमांक 0=रवि…6=शनि ─────────────────────────
+    // Day part (1–8 of sunrise→sunset) per weekday (0=Sun … 6=Sat).
+    // Standard Panchang values: Sun → Rahu 8th, Yamaganda 5th, Gulika 7th.
     private const RAHU_PART   = [8,2,7,5,6,4,3];
-    private const YAMA_PART   = [4,8,3,7,1,2,6];
-    private const GULIKA_PART = [6,5,4,3,2,1,7];
+    private const YAMA_PART   = [5,4,3,2,1,7,6];
+    private const GULIKA_PART = [7,6,5,4,3,2,1];
     private const DURMUHURTA_PART = [
         0 => [3, 5], 1 => [7], 2 => [3, 8], 3 => [6], 4 => [6, 7], 5 => [1, 8], 6 => [1, 2]
     ];
