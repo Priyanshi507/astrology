@@ -1421,29 +1421,12 @@ async function loadTodayPanel() {
   const content = document.getElementById('todayContent');
   if (!content) { _todayLoading = false; return; }
 
-  // Show spinner
+  // Show light-themed spinner until the server's (light) Today HTML arrives
   content.innerHTML = `
     <div class="td-loading" style="justify-content:center;min-height:180px;align-items:center;flex-direction:column;gap:14px;width:100%">
       <span class="td-spinner" style="font-size:2.4rem">🪷</span>
       <span style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:1.1rem;color:var(--text-mid);text-align:center">आज का पंचांग गणना हो रहा है…</span>
     </div>`;
-
-// Force max 2 seconds — show fallback if server takes longer
-const _loadTimeout = setTimeout(() => {
-  if (!_todayLoaded) {
-    const el = document.getElementById('todayContent');
-    if (el && el.querySelector('.td-spinner')) {
-      el.innerHTML = buildTodayFallback({
-        dateISO: document.getElementById('dateInput').value,
-        pancha: {}, planetPositions: _planets || {},
-        sunrise: document.getElementById('sunriseTime')?.textContent || '—',
-        sunset:  document.getElementById('sunsetTime')?.textContent  || '—',
-        dayLength: document.getElementById('dayLength')?.textContent || '—',
-      });
-      _todayLoaded = true;
-    }
-  }
-}, 2000);
 
   try {
     const date = document.getElementById('dateInput').value;
@@ -1480,7 +1463,6 @@ const _loadTimeout = setTimeout(() => {
       throw new Error('Empty response from server');
     }
 
-    clearTimeout(_loadTimeout);
     content.innerHTML = html;
     _todayLoaded  = true;
 
@@ -1846,215 +1828,5 @@ function set(id,val){
       }, 100);
     }
 
-/**
- * Minimal fallback — shown when PHP doesn't return an 'html' key.
- * Renders core panchanga + planets in the dark temple style.
- */
-function buildTodayFallback(data) {
-    const p       = data.panchanga || data.panchaDetails || {};
-    const tithi   = p.tithi      || {};
-    const vara    = p.vara       || {};
-    const nak     = p.nakshatra  || {};
-    const yoga    = p.yoga       || {};
-    const karana  = p.karana     || {};
-    const moon    = data.moon    || {};
-    const mq      = data.muhurtaQuality || {};
-    const sunrise = data.sunrise  || '—';
-    const sunset  = data.sunset   || '—';
-    const dayLen  = data.dayLength|| '—';
- 
-    const mqColor = {'Excellent':'#2e7a40','Good':'#1d4e6f','Mixed':'#c47a20','Challenging':'#b83020'}[mq.label] || '#1d4e6f';
-    const mqPct   = mq.pct || 0;
- 
-    const todayFests = data.todayFestivals || {};
-    const allFests   = [
-        ...(todayFests.vrat    || []),
-        ...(todayFests.parv    || []),
-        ...(todayFests.jayanti || []),
-        ...(todayFests.other   || []),
-    ];
- 
-    const MONTHS_HI = ['','जनवरी','फरवरी','मार्च','अप्रैल','मई','जून',
-                       'जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
-    const [yr, mo, dy2] = (data.dateISO || '2000-01-01').split('-').map(Number);
- 
-    const PORDER = ['sun','moon','mercury','venus','mars','jupiter','saturn','rahu','ketu'];
-    const PHINDI = {sun:'सूर्य',moon:'चन्द्र',mercury:'बुध',venus:'शुक्र',
-                    mars:'मंगल',jupiter:'गुरु',saturn:'शनि',rahu:'राहु',ketu:'केतु'};
-    const PCOLOR = {sun:'#c8a84b',moon:'#7ab8d8',mercury:'#5ac8a8',venus:'#e890d0',
-                    mars:'#d86040',jupiter:'#d4a840',saturn:'#9080c0',rahu:'#80b880',ketu:'#c08870'};
- 
-    const planets = data.planetPositions || {};
- 
-    const planetCards = PORDER.map(pid => {
-        const pp = planets[pid]; if (!pp) return '';
-        const clr = PCOLOR[pid];
-        return `<div style="background:linear-gradient(160deg,#1a1710,#24201a);
-                    border:1px solid ${clr}33;border-top:3px solid ${clr};
-                    border-radius:13px;padding:11px 12px;">
-            <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:1rem;
-                        color:${clr};font-weight:700;margin-bottom:1px">${PHINDI[pid]}</div>
-            <div style="font-size:.62rem;color:#7a7060;letter-spacing:1px;
-                        text-transform:uppercase;margin-bottom:5px">
-                ${pp.name||pid}${pp.retro ? ' <span style="color:#d86040">ℛ</span>' : ''}
-            </div>
-            <div style="font-size:.86rem;color:#f5f0e8;font-weight:600">${pp.sign||'—'}</div>
-            <div style="font-size:.66rem;color:#a89878;margin-top:2px;line-height:1.5">
-                ${pp.nak||'—'} · Pada ${pp.pada||'?'}<br>${Number(pp.deg||0).toFixed(2)}°
-            </div>
-        </div>`;
-    }).join('');
- 
-    const upFests  = (data.upcomingFestivals||[]).slice(0,10);
-    const pastFests= (data.pastFestivals    ||[]).slice(0,10);
-    const today    = data.dateISO || '';
- 
-    const festRow = (f, isPast) => {
-        const daysA = (!isPast && f.date && today)
-            ? Math.round((new Date(f.date) - new Date(today)) / 86400000) : 0;
-        const dLbl = isPast ? '' : (daysA===0?'आज':daysA===1?'कल':daysA+' दिन');
-        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;
-                            border-bottom:1px solid rgba(200,168,75,.07)">
-            <div style="flex:1;font-size:.78rem;color:${isPast?'#a89878':'#e0d8c8'}">${f.name||'—'}</div>
-            <div style="text-align:right;flex-shrink:0">
-                <div style="font-size:.62rem;color:#7a7060">${f.date||''}</div>
-                ${dLbl?`<div style="font-size:.6rem;font-weight:800;color:#c8a84b">${dLbl}</div>`:''}
-            </div>
-        </div>`;
-    };
- 
-    return `
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Playfair+Display:wght@700;900&family=Crimson+Pro:wght@400;600&display=swap');
-.tpf{background:#0e0c08;color:#e0d8c8;padding:22px 18px 30px;border-radius:16px;
-     font-family:'Crimson Pro',Georgia,serif;}
-.tpf *{box-sizing:border-box}
-.tpf-card{background:linear-gradient(135deg,#1a1710,#24201a);
-          border:1px solid rgba(200,168,75,.18);border-radius:15px;padding:15px 17px;margin-bottom:10px;}
-.tpf-div{display:flex;align-items:center;gap:12px;margin:22px 0 12px}
-.tpf-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,#8a6820,transparent)}
-.tpf-lbl{font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:#c8a84b;
-         font-family:'Playfair Display',serif;font-weight:700;white-space:nowrap}
-.tpf-pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.tpf-ag{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:8px}
-.tpf-ac{background:linear-gradient(160deg,#1a1710,#24201a);border:1px solid rgba(200,168,75,.2);
-        border-top:3px solid #8a6820;border-radius:11px;padding:11px 9px;text-align:center}
-.tpf-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:680px){
-    .tpf-ag{grid-template-columns:repeat(3,1fr)}
-    .tpf-pg{grid-template-columns:repeat(3,1fr)}
-    .tpf-2col{grid-template-columns:1fr}
-}
-</style>
-<div class="tpf">
- 
-  <!-- HERO -->
-  <div class="tpf-card" style="background:linear-gradient(135deg,#1a1500,#0e0c00);
-       border-color:rgba(200,168,75,.3);padding:18px 20px;margin-bottom:14px">
-    <div style="display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap">
-      <div style="text-align:center;flex-shrink:0">
-        <div style="font-family:'Playfair Display',serif;font-size:3.2rem;font-weight:900;
-                    line-height:1;color:#c8a84b">${dy2}</div>
-        <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:.9rem;color:#e8cc80">${MONTHS_HI[mo]}</div>
-        <div style="font-size:.65rem;color:#7a7060">${yr}</div>
-      </div>
-      <div style="flex:1;min-width:170px">
-        <div style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:#7a7060;margin-bottom:3px">Vedic Day · वार</div>
-        <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:1.4rem;color:#c8a84b;font-weight:700;margin-bottom:4px">
-            ${vara.name||'—'} <span style="font-size:.8rem;color:#a89878;font-style:italic">· ${vara.en||''}</span>
-        </div>
-        <div style="font-size:.75rem;color:#a89878;margin-bottom:9px">${allFests.length?allFests[0].name:'कोई विशेष पर्व नहीं'}</div>
-        <div style="display:flex;gap:7px;flex-wrap:wrap">
-          ${['उदय|'+sunrise,'अस्त|'+sunset,'दिन|'+dayLen].map(x=>{const[l,v]=x.split('|');return`
-          <div style="background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);border-radius:9px;padding:5px 11px;font-size:.73rem">
-            <span style="color:#7a7060">${l} </span><strong style="color:#c8a84b">${v}</strong>
-          </div>`;}).join('')}
-        </div>
-      </div>
-      <div style="flex-shrink:0;text-align:right;min-width:120px">
-        <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:1.15rem;color:${mqColor};font-weight:700;margin-bottom:2px">
-            ${{'Excellent':'श्रेष्ठ','Good':'शुभ','Mixed':'मिश्रित','Challenging':'साधारण'}[mq.label]||'शुभ'}
-        </div>
-        <div style="font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:#7a7060;margin-bottom:6px">मुहूर्त गुणवत्ता</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="background:rgba(255,255,255,.08);border-radius:4px;height:5px;flex:1;overflow:hidden">
-            <div style="width:${mqPct}%;height:100%;background:${mqColor};border-radius:4px"></div>
-          </div>
-          <span style="font-size:.76rem;font-weight:700;color:${mqColor}">${mqPct}%</span>
-        </div>
-      </div>
-    </div>
-    ${allFests.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">
-      ${allFests.slice(0,5).map(f=>`<span style="display:inline-flex;align-items:center;padding:3px 11px;
-        background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.25);border-radius:50px;
-        font-size:.7rem;font-weight:700;color:#c8a84b;white-space:nowrap">${f.name||'—'}</span>`).join('')}
-    </div>`:''}
-  </div>
- 
-  <!-- PANCHANGA -->
-  <div class="tpf-div"><div class="tpf-line"></div><span class="tpf-lbl">पञ्चाङ्ग — Panchanga</span><div class="tpf-line"></div></div>
-  <div class="tpf-ag">
-    ${[['①','तिथि','Tithi',`${tithi.paksha||''} ${tithi.name||'—'}`,`${tithi.lord||''} · ${tithi.nature||''}`],
-       ['②','वार','Vara',vara.name||'—',`${vara.lord||''} · ${vara.nature||''}`],
-       ['③','नक्षत्र','Nakshatra',nak.name||'—',`Pada ${nak.pada||'?'} · ${nak.lord||''}`],
-       ['④','योग','Yoga',yoga.name||'—',`${yoga.nature||''} · ${yoga.lord||''}`],
-       ['⑤','करण','Karana',karana.name||'—',`${karana.type||''} · ${karana.lord||''}`]
-    ].map(([n,h,e,nm,sb])=>`
-    <div class="tpf-ac">
-      <div style="font-size:.52rem;letter-spacing:1.5px;color:#7a7060;margin-bottom:2px;text-transform:uppercase">${n} ${e}</div>
-      <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:.68rem;color:#c8a84b;margin-bottom:4px">${h}</div>
-      <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:1rem;color:#f5f0e8;font-weight:700;line-height:1.2;margin-bottom:2px">${nm}</div>
-      <div style="font-size:.62rem;color:#a89878;line-height:1.35">${sb}</div>
-    </div>`).join('')}
-  </div>
- 
-  <!-- TODAY OBSERVANCES -->
-  ${allFests.length?`
-  <div class="tpf-div"><div class="tpf-line"></div><span class="tpf-lbl">आज के पर्व एवं व्रत</span><div class="tpf-line"></div></div>
-  <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:8px">
-    ${allFests.map(f=>`
-    <div style="background:linear-gradient(135deg,#120828,#1e0f40);border:1.5px solid rgba(160,80,255,.3);
-                border-radius:13px;padding:11px 14px;flex:1;min-width:190px;max-width:340px">
-      <div style="font-family:'Playfair Display',serif;font-size:.9rem;color:#b878ff;font-weight:700;margin-bottom:4px">${f.name||'—'}</div>
-      <div style="font-size:.7rem;color:rgba(255,255,255,.42);line-height:1.5">${(f.significance||f.desc||'').slice(0,85)}</div>
-      ${f.mantra?`<div style="margin-top:6px;padding:4px 8px;background:rgba(255,255,255,.05);border-radius:6px;
-                              font-family:'Tiro Devanagari Sanskrit',serif;font-size:.76rem;color:rgba(255,255,255,.48)">${f.mantra}</div>`:''}
-    </div>`).join('')}
-  </div>`:''}
- 
-  <!-- PLANETS -->
-  <div class="tpf-div"><div class="tpf-line"></div><span class="tpf-lbl">ग्रह स्थिति — Planetary Positions</span><div class="tpf-line"></div></div>
-  <div class="tpf-pg" style="margin-bottom:10px">${planetCards}</div>
- 
-  <!-- FESTIVAL CALENDAR -->
-  <div class="tpf-div"><div class="tpf-line"></div><span class="tpf-lbl">पर्व कैलेंडर — Festival Calendar</span><div class="tpf-line"></div></div>
-  <div class="tpf-2col">
-    <div class="tpf-card" style="padding:13px">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:11px">
-        <span style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:.95rem;color:#a89878;font-weight:700">विगत पर्व</span>
-        <span style="font-size:.58rem;color:#7a7060;text-transform:uppercase;letter-spacing:1px">Last 15 Days</span>
-      </div>
-      ${pastFests.length ? pastFests.map(f=>festRow(f,true)).join('') : '<div style="font-size:.76rem;color:#7a7060;font-style:italic">No recent festivals</div>'}
-    </div>
-    <div class="tpf-card" style="padding:13px">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:11px">
-        <span style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:.95rem;color:#c8a84b;font-weight:700">आगामी पर्व</span>
-        <span style="font-size:.58rem;color:#7a7060;text-transform:uppercase;letter-spacing:1px">Next 15 Days</span>
-      </div>
-      ${upFests.length ? upFests.map(f=>festRow(f,false)).join('') : '<div style="font-size:.76rem;color:#7a7060;font-style:italic">No upcoming festivals</div>'}
-    </div>
-  </div>
- 
-  <!-- FOOTER -->
-  <div class="tpf-card" style="margin-top:12px;padding:13px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
-    <div style="font-family:'Tiro Devanagari Sanskrit',serif;font-size:.9rem;color:#7ab8d8;font-weight:700">चन्द्र · Moon</div>
-    <div style="font-size:.74rem;color:#a89878">${moon.sign||'—'} · ${moon.nakshatra||'—'} · ${moon.paksha||''} Tithi ${moon.tithiNum||''}</div>
-    <div style="margin-left:auto;font-size:.74rem;color:#a89878">
-      <span style="color:#7a7060;font-size:.6rem;text-transform:uppercase;letter-spacing:1px">दशा · </span>${data.dasha||'—'}
-    </div>
-  </div>
- 
-</div>`;
-}
 
 </script>

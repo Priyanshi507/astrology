@@ -62,9 +62,6 @@
       <button onclick="goShift(-1)" title="Previous" style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--sky-pale);background:var(--card);color:var(--text-mid);cursor:pointer;font-size:1rem">‹</button>
       <button onclick="goShift(1)"  title="Next"     style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--sky-pale);background:var(--card);color:var(--text-mid);cursor:pointer;font-size:1rem">›</button>
     </div>
-
-    {{-- PDF --}}
-    <button onclick="downloadGocharPDF()" style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1d4e6f,#0f3450);color:#fff;border:none;border-radius:30px;padding:9px 18px;cursor:pointer;font-weight:700;font-size:.84rem">⬇ Download PDF</button>
   </div>
 
   <div id="gocharContent" style="font-family:'DM Sans',sans-serif">

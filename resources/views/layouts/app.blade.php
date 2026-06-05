@@ -719,9 +719,9 @@ box-shadow: 0 2px 12px -3px rgba(180,100,20,.7) !important;
 }
 @keyframes td-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* Today panel wraps the server-rendered .tp-root HTML */
+/* Today panel wraps the server-rendered light .tp HTML (styles live in
+   TodayPanelService::renderHtml — this is only the load-time spinner). */
 #todayContent{
-  /* tp-root is dark-themed; give it a subtle rounded wrapper */
   border-radius:20px;
   overflow:hidden;
 }

@@ -227,6 +227,7 @@ namespace App\Features\Festival;
                     'nature' => $tithi['nature'],
                     'elong'  => round($activeTK['elong'], 2),
                     'prog'   => round($activeTK['tithiProg'] * 100, 1),
+                    'half'   => $activeTK['tithiHalf'],
                 ],
                 'vara' => [
                     'name'      => $vara['n'],
@@ -256,6 +257,7 @@ namespace App\Features\Festival;
                     'avoid'   => $nakHints['avoid'],
                     'color'   => $nakHints['color'],
                     'num'     => $pancha['nakIdx'] + 1,
+                    'prog'    => round(($pancha['nakProg'] ?? 0) * 100, 1),
                 ],
                 'yoga' => [
                     'name'   => $yoga['n'],
@@ -268,6 +270,7 @@ namespace App\Features\Festival;
                     'color'  => $yogaAdvice[2],
                     'desc'   => $yoga['desc'],
                     'num'    => $pancha['yogaIdx'] + 1,
+                    'prog'   => round(($pancha['yogaProg'] ?? 0) * 100, 1),
                 ],
                 'karana' => [
                     'name'   => $karana['n'],
@@ -726,7 +729,58 @@ namespace App\Features\Festival;
             . '</div>';
     
         $h .= '</div></div>'; // hero-inner + hero
-    
+
+        // ══════════════════════════════════════════════
+        // 1b. PANCHANGA-AT-A-GLANCE DIAGRAM (SVG)
+        // ══════════════════════════════════════════════
+        $sr = substr($sunrise, 0, 5);
+        $st = substr($sunset, 0, 5);
+
+        $ring = function (float $prog, string $col, string $labelHi, string $val): string {
+            $prog = max(0.0, min(100.0, $prog));
+            $r = 34.0; $c = 2 * M_PI * $r; $off = $c * (1 - $prog / 100);
+            return '<div style="display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;min-width:96px">'
+                . '<svg width="88" height="88" viewBox="0 0 84 84">'
+                . '<circle cx="42" cy="42" r="34" fill="none" stroke="rgba(120,90,30,.12)" stroke-width="7"/>'
+                . '<circle cx="42" cy="42" r="34" fill="none" stroke="' . $col . '" stroke-width="7" stroke-linecap="round"'
+                . ' stroke-dasharray="' . round($c, 2) . '" stroke-dashoffset="' . round($off, 2) . '" transform="rotate(-90 42 42)"/>'
+                . '<text x="42" y="40" text-anchor="middle" font-family="Playfair Display,serif" font-size="17" font-weight="700" fill="' . $col . '">' . round($prog) . '%</text>'
+                . '<text x="42" y="56" text-anchor="middle" font-size="8.5" fill="#9a8a6a">' . htmlspecialchars($val) . '</text>'
+                . '</svg>'
+                . '<div style="font-family:\'Tiro Devanagari Sanskrit\',serif;font-size:1.05rem;color:#5a4a30;font-weight:600">' . $labelHi . '</div>'
+                . '</div>';
+        };
+
+        $h .= '<div class="ta ta1" style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:28px">';
+
+        // Sun arc card
+        $h .= '<div style="flex:2;min-width:240px;background:#fffdf6;border:1.5px solid var(--rule);border-radius:16px;padding:14px 20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+            . '<svg width="100%" height="96" viewBox="0 0 260 96" preserveAspectRatio="xMidYMid meet">'
+            . '<defs><linearGradient id="tpSun" x1="0" y1="0" x2="1" y2="0">'
+            . '<stop offset="0" stop-color="#e8902a"/><stop offset="0.5" stop-color="#f5c130"/><stop offset="1" stop-color="#e8902a"/>'
+            . '</linearGradient></defs>'
+            . '<line x1="20" y1="74" x2="240" y2="74" stroke="rgba(120,90,30,.18)" stroke-width="1.5"/>'
+            . '<path d="M24 74 Q130 -6 236 74" fill="none" stroke="url(#tpSun)" stroke-width="3.5" stroke-linecap="round"/>'
+            . '<circle cx="130" cy="18" r="16" fill="#f5c130" opacity="0.25"/>'
+            . '<circle cx="130" cy="18" r="8" fill="#f3b12a"/>'
+            . '<circle cx="24" cy="74" r="4" fill="#e8902a"/><circle cx="236" cy="74" r="4" fill="#c06028"/>'
+            . '<text x="24" y="90" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" font-weight="600" fill="#a05818">' . $sr . '</text>'
+            . '<text x="236" y="90" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" font-weight="600" fill="#7a4080">' . $st . '</text>'
+            . '<text x="24" y="62" text-anchor="middle" font-family="Tiro Devanagari Sanskrit,serif" font-size="10" fill="#b07840">उदय</text>'
+            . '<text x="236" y="62" text-anchor="middle" font-family="Tiro Devanagari Sanskrit,serif" font-size="10" fill="#8060a0">अस्त</text>'
+            . '</svg>'
+            . '<div style="font-family:\'Tiro Devanagari Sanskrit\',serif;font-size:.95rem;color:#8a6020;margin-top:2px">दिन की लम्बाई · ' . $dayLen . '</div>'
+            . '</div>';
+
+        // Progress rings
+        $h .= '<div style="flex:3;min-width:300px;background:#fffdf6;border:1.5px solid var(--rule);border-radius:16px;padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-around">'
+            . $ring((float)($tithi['prog'] ?? 0), '#c48a2f', 'तिथि', ($tithi['num'] ?? '') . '/15')
+            . $ring((float)($nak['prog']   ?? 0), '#1d6aaa', 'नक्षत्र', ($nak['num'] ?? '') . '/27')
+            . $ring((float)($yoga['prog']  ?? 0), '#2d7a3a', 'योग', ($yoga['num'] ?? '') . '/27')
+            . '</div>';
+
+        $h .= '</div>';
+
         // ══════════════════════════════════════════════
         // 2. PANCHANGA
         // ══════════════════════════════════════════════

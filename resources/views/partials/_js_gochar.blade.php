@@ -1,7 +1,3 @@
-{{-- PDF libraries (loaded once) --}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
 // ── Dynamic Gochar panel ────────────────────────────────────────────────
 let _goMode = 'date';
@@ -100,43 +96,4 @@ async function gocharFetch(){
   }
 }
 
-// ── PDF download (rasterise the rendered panel → multi-page A4) ──────────
-async function downloadGocharPDF(){
-  const node = document.getElementById('gocharContent');
-  if (!node || typeof html2canvas === 'undefined' || !window.jspdf){
-    alert('PDF libraries are still loading — please try again in a moment.');
-    return;
-  }
-  const canvas = await html2canvas(node, {scale:2, backgroundColor:'#ffffff', useCORS:true});
-  const img = canvas.toDataURL('image/png');
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p','mm','a4');
-  const pw = pdf.internal.pageSize.getWidth();
-  const ph = pdf.internal.pageSize.getHeight();
-  const imgW = pw - 16;
-  const imgH = canvas.height * imgW / canvas.width;
-  let left = imgH, pos = 8;
-  pdf.setFontSize(13);
-  pdf.text('Gochar Phal — Planetary Transit Report', 8, 6);
-  if (imgH <= ph - 12){
-    pdf.addImage(img, 'PNG', 8, pos, imgW, imgH);
-  } else {
-    // slice across pages
-    let y = 0;
-    const pageImgH = ph - 12;
-    const pxPerMm = canvas.width / imgW;
-    while (y < canvas.height){
-      const sliceH = Math.min(pageImgH * pxPerMm, canvas.height - y);
-      const c2 = document.createElement('canvas');
-      c2.width = canvas.width; c2.height = sliceH;
-      c2.getContext('2d').drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-      const slice = c2.toDataURL('image/png');
-      if (y > 0) pdf.addPage();
-      pdf.addImage(slice, 'PNG', 8, 8, imgW, sliceH / pxPerMm);
-      y += sliceH;
-    }
-  }
-  const stamp = (document.getElementById('goDate').value || new Date().toISOString().slice(0,10));
-  pdf.save('gochar-'+_goMode+'-'+stamp+'.pdf');
-}
 </script>
