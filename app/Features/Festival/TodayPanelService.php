@@ -511,163 +511,136 @@ namespace App\Features\Festival;
         $h .= "@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:ital@0;1&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');";
         $h .= '
     .tp{
-    --cream:#fdf8f2;
-    --cream2:#f5ede0;
-    --cream3:#e8d8c8;
-    --ink:#1c1208;
-    --ink2:#3a2a18;
-    --ink3:#6a5040;
-    --ink4:#9a8070;
-    --rule:rgba(120,90,50,.16);
-    --gold:#8a6010;
-    --gold-lt:#c8a848;
-    --terra:#a03818;
-    font-family:"Crimson Pro",Georgia,serif;
-    color:var(--ink);
-    background:var(--cream);
-    padding:32px 28px 52px;
-    max-width:1200px;
-    margin:0 auto;
-    border-radius:16px;
+    --sky:#1d4e6f;--sky2:#2a6d9c;--sky-lt:#5d8bb8;--sky-pale:#dbe9f5;--sky-wash:#f1f7fc;
+    --gold:#bf871f;--gold-d:#8a6010;--gold-pale:#fbf2dc;
+    --ink:#0e2d3f;--ink2:#234a62;--ink3:#4a6a82;--ink4:#86a0b3;
+    --card:#ffffff;--rule:#e4edf4;--soft:#f5f9fc;
+    --terra:#c0490f;--green:#2e7d52;
+    font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);width:100%;
     }
     .tp *{box-sizing:border-box}
-    
-    /* ── Section dividers ── */
-    .tp-div{display:flex;align-items:center;gap:16px;margin:38px 0 18px}
-    .tp-div-line{flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent)}
-    .tp-div-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.6rem;font-weight:400;color:var(--gold);white-space:nowrap}
-    .tp-div-en{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.82rem;letter-spacing:.5px;color:var(--ink4);white-space:nowrap}
-    
-    /* ── Inner cards stay cream ── */
-    .tp-card{background:var(--cream2);border:1.5px solid var(--rule);border-radius:12px;padding:22px 26px}
-    
-    /* ── HERO ── */
-    .tp-hero{
-    background:var(--cream2);
-    border:1.5px solid rgba(168,120,40,.22);
-    border-radius:16px;padding:30px 34px;
-    margin-bottom:16px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
-    }
-    .tp-hero-inner{display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:start}
-    @media(max-width:680px){.tp-hero-inner{grid-template-columns:1fr;gap:18px}.tp-hero-right{text-align:left!important}}
-    
-    .tp-date-num{font-family:"Playfair Display",serif;font-size:5.5rem;font-weight:700;line-height:1;color:var(--gold);letter-spacing:-3px}
-    .tp-date-month{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.3rem;color:var(--terra);margin-top:-6px}
-    .tp-date-year{font-family:"Playfair Display",serif;font-size:.95rem;color:var(--ink4);letter-spacing:1px}
-    
-    .tp-vara-lbl{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.85rem;color:var(--ink4);margin-bottom:6px}
-    .tp-vara-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:3.2rem;color:var(--ink);line-height:1;margin-bottom:6px}
-    .tp-vara-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.1rem;color:var(--ink3);margin-bottom:16px}
-    
-    .tp-sun-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
-    .tp-sun-chip{display:flex;align-items:center;gap:9px;background:var(--cream);border:1px solid rgba(168,120,40,.2);border-radius:10px;padding:8px 16px}
-    .tp-sun-chip-lbl{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1rem;color:var(--ink3)}
-    .tp-sun-chip-val{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.1rem;font-weight:700;color:var(--ink2)}
-    
-    .tp-fest-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
-    .tp-fest-pill{display:inline-flex;align-items:center;background:rgba(138,96,16,.1);border:1px solid rgba(138,96,16,.28);border-radius:50px;padding:6px 18px;font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.05rem;color:var(--gold)}
-    
-    .tp-mq-lbl{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.85rem;color:var(--ink4);margin-bottom:8px}
-    .tp-mq-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:2.4rem;line-height:1;margin-bottom:4px}
+
+    /* Section dividers — modern */
+    .tp-div{display:flex;align-items:center;gap:14px;margin:36px 0 20px}
+    .tp-div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--sky-pale),transparent)}
+    .tp-div-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.5rem;font-weight:400;color:var(--sky);white-space:nowrap}
+    .tp-div-en{font-size:.78rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:800;color:var(--ink4);white-space:nowrap}
+
+    .tp-card{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;box-shadow:0 2px 16px rgba(20,60,100,.05)}
+
+    /* HERO — gradient banner */
+    .tp-hero{background:linear-gradient(135deg,#173f60 0%,#235f8c 52%,#2e79a8 100%);border:none;border-radius:22px;padding:32px 38px;margin-bottom:22px;position:relative;overflow:hidden;box-shadow:0 18px 44px -14px rgba(16,55,95,.5)}
+    .tp-hero::after{content:"";position:absolute;top:-45%;right:-8%;width:360px;height:360px;background:radial-gradient(circle,rgba(255,205,110,.2),transparent 70%);pointer-events:none}
+    .tp-hero-inner{display:grid;grid-template-columns:auto 1fr auto;gap:36px;align-items:center;position:relative;z-index:1}
+    @media(max-width:760px){.tp-hero-inner{grid-template-columns:1fr;gap:22px}.tp-hero-right{text-align:left!important}}
+
+    .tp-date-num{font-family:"Playfair Display",serif;font-size:5.6rem;font-weight:700;line-height:.88;color:#ffd47a;letter-spacing:-2px;text-shadow:0 3px 22px rgba(0,0,0,.28)}
+    .tp-date-month{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.35rem;color:#d2e7f8;margin-top:3px}
+    .tp-date-year{font-family:"DM Mono",monospace;font-size:.88rem;color:rgba(255,255,255,.55);letter-spacing:3px;margin-top:2px}
+
+    .tp-vara-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:2.2px;font-weight:800;color:rgba(255,255,255,.58);margin-bottom:7px}
+    .tp-vara-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:3rem;color:#fff;line-height:1;margin-bottom:7px}
+    .tp-vara-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.12rem;color:#bcdcf0;margin-bottom:18px}
+
+    .tp-sun-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+    .tp-sun-chip{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:9px 17px}
+    .tp-sun-chip-lbl{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.85rem;color:rgba(255,255,255,.62)}
+    .tp-sun-chip-val{font-family:"DM Mono",monospace;font-size:1.05rem;font-weight:600;color:#fff}
+
+    .tp-fest-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .tp-fest-pill{display:inline-flex;align-items:center;background:rgba(255,210,120,.16);border:1px solid rgba(255,210,120,.42);border-radius:50px;padding:6px 17px;font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.02rem;color:#ffe1a4}
+
+    .tp-mq-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:2.2px;font-weight:800;color:rgba(255,255,255,.58);margin-bottom:10px}
+    .tp-mq-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:2.5rem;line-height:1;margin-bottom:10px;color:#fff!important}
     .tp-mq-bar{display:flex;align-items:center;gap:10px;justify-content:flex-end}
-    .tp-mq-track{background:var(--cream3);border-radius:4px;height:7px;flex:1;max-width:120px;overflow:hidden}
-    .tp-mq-fill{height:100%;border-radius:4px}
-    .tp-mq-pct{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;font-weight:700}
-    
-    /* ── PANCHANGA 5-anga grid ── */
-    .tp-anga-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--cream3);border:1.5px solid rgba(168,120,40,.22);border-radius:12px;overflow:hidden;margin-bottom:24px}
+    .tp-mq-track{background:rgba(255,255,255,.22);border-radius:5px;height:8px;flex:1;max-width:130px;overflow:hidden}
+    .tp-mq-fill{height:100%;border-radius:5px;background:#ffd47a!important}
+    .tp-mq-pct{font-family:"DM Mono",monospace;font-size:.92rem;font-weight:700;color:#ffd47a!important}
+
+    /* PANCHANGA 5-anga grid — modern cards */
+    .tp-anga-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
     @media(max-width:760px){.tp-anga-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:440px){.tp-anga-grid{grid-template-columns:repeat(2,1fr)}}
-    .tp-anga{background:var(--cream);padding:24px 18px;transition:background .2s}
-    .tp-anga:hover{background:#fff8ef}
-    .tp-anga.feat{background:var(--cream2);border-left:3px solid var(--terra)}
-    .tp-anga-label{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.85rem;color:var(--ink4);margin-bottom:8px;letter-spacing:.3px}
-    .tp-anga-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:2rem;color:var(--ink);line-height:1.25;margin-bottom:6px}
-    .tp-anga-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink3);line-height:1.55}
-    
-    /* ── Detail cards ── */
-    .tp-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-bottom:8px}
-    .tp-detail-card{border-top:3px solid var(--rule);padding:16px 4px 0}
-    .tp-detail-head{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.15rem;color:var(--ink2);margin-bottom:10px}
+    .tp-anga{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--sky-lt);border-radius:14px;padding:18px 16px;box-shadow:0 2px 12px rgba(20,60,100,.05);transition:transform .2s,box-shadow .2s}
+    .tp-anga:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(20,60,100,.12)}
+    .tp-anga.feat{border-top-color:var(--gold)}
+    .tp-anga-label{font-size:.66rem;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;color:var(--ink4);margin-bottom:9px}
+    .tp-anga-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.85rem;color:var(--ink);line-height:1.2;margin-bottom:6px}
+    .tp-anga-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.92rem;color:var(--ink3);line-height:1.5}
+
+    /* Detail cards */
+    .tp-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:8px}
+    .tp-detail-card{background:var(--soft);border:1px solid var(--rule);border-top:3px solid var(--sky-lt);border-radius:14px;padding:16px 18px}
+    .tp-detail-head{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.15rem;color:var(--sky);margin-bottom:10px;font-weight:600}
     .tp-detail-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--rule)}
     .tp-detail-row:last-child{border-bottom:none}
-    .tp-detail-key{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink3);flex-shrink:0}
-    .tp-detail-val{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink2);text-align:right;font-weight:600}
-    
-    /* ── OBSERVANCES ── */
-    .tp-obs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .tp-detail-key{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.92rem;color:var(--ink3);flex-shrink:0}
+    .tp-detail-val{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink);text-align:right;font-weight:700}
+
+    /* OBSERVANCES */
+    .tp-obs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     @media(max-width:640px){.tp-obs-grid{grid-template-columns:1fr}}
-    .tp-obs{border-radius:10px;overflow:hidden;border:1.5px solid var(--rule)}
-    .tp-obs-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--rule)}
-    .tp-obs-head-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.6rem;font-weight:400}
-    .tp-obs-head-en{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink4);margin-top:3px}
-    .tp-obs-cnt{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;font-weight:700;padding:4px 14px;border-radius:50px;flex-shrink:0}
-    .tp-obs-body{padding:6px 18px}
-    .tp-obs-empty{padding:16px 18px;font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.05rem;font-style:italic;color:var(--ink4)}
-    .tp-fest-row{display:flex;align-items:flex-start;gap:10px;padding:13px 0;border-bottom:1px solid var(--rule)}
+    .tp-obs{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--rule);box-shadow:0 2px 12px rgba(20,60,100,.05)}
+    .tp-obs-head{padding:15px 19px;display:flex;align-items:center;justify-content:space-between}
+    .tp-obs-head-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.55rem;font-weight:400}
+    .tp-obs-head-en{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--ink4);margin-top:3px}
+    .tp-obs-cnt{font-family:"DM Mono",monospace;font-size:.92rem;font-weight:700;padding:4px 13px;border-radius:50px;flex-shrink:0;background:#fff}
+    .tp-obs-body{padding:4px 19px}
+    .tp-obs-empty{padding:18px 19px;font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.02rem;font-style:italic;color:var(--ink4)}
+    .tp-fest-row{display:flex;align-items:flex-start;gap:11px;padding:13px 0;border-bottom:1px solid var(--rule)}
     .tp-fest-row:last-child{border-bottom:none}
     .tp-fest-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:7px}
-    .tp-fest-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.15rem;color:var(--ink);line-height:1.35}
-    .tp-fest-desc{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.92rem;color:var(--ink3);line-height:1.55;margin-top:4px}
-    .tp-fest-mantra{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;margin-top:5px;font-style:italic}
-    
-    /* ── PLANETS ── */
+    .tp-fest-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.12rem;color:var(--ink);line-height:1.35;font-weight:600}
+    .tp-fest-desc{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;color:var(--ink3);line-height:1.5;margin-top:4px}
+    .tp-fest-mantra{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.92rem;margin-top:5px;font-style:italic}
+
+    /* PLANETS */
     .tp-planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
-    .tp-pc{border-radius:10px;padding:17px 18px;border-top:3px solid transparent;border-left:1px solid;border-right:1px solid;border-bottom:1px solid;transition:transform .2s,box-shadow .2s}
-    .tp-pc:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(120,80,20,.1)}
-    .tp-pc-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:2.1rem;line-height:1;margin-bottom:2px}
-    .tp-pc-sign{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.35rem;color:var(--ink2);line-height:1.25;margin-bottom:4px}
-    .tp-pc-nak{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.92rem;color:var(--ink3);line-height:1.65}
-    .tp-retro{display:inline-block;font-family:"Tiro Devanagari Sanskrit",serif;font-size:.75rem;font-weight:700;border:1.5px solid;border-radius:4px;padding:2px 9px;margin-top:7px}
-    
-    /* ── SIGN CHANGES ── */
-    .tp-sc-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)}
+    .tp-pc{background:var(--card)!important;border-radius:14px;padding:16px 18px;border:1px solid var(--rule);border-top:3px solid transparent;box-shadow:0 2px 12px rgba(20,60,100,.05);transition:transform .2s,box-shadow .2s}
+    .tp-pc:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(20,60,100,.12)}
+    .tp-pc-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:2rem;line-height:1;margin-bottom:3px}
+    .tp-pc-sign{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.3rem;color:var(--ink);line-height:1.25;margin-bottom:4px;font-weight:600}
+    .tp-pc-nak{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;color:var(--ink3);line-height:1.6}
+    .tp-retro{display:inline-block;font-family:"DM Sans",sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border:1.5px solid;border-radius:20px;padding:2px 10px;margin-top:8px}
+
+    /* SIGN CHANGES */
+    .tp-sc-row{display:flex;align-items:center;gap:14px;padding:13px 2px;border-bottom:1px solid var(--rule)}
     .tp-sc-row:last-child{border-bottom:none}
-    .tp-sc-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.35rem;min-width:80px}
+    .tp-sc-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.3rem;min-width:84px;font-weight:600}
     .tp-sc-arrow{color:var(--ink4);font-size:1.1rem}
-    .tp-sc-to{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.25rem;font-weight:700;flex:1}
-    /* FIX: larger, darker date in sign-change */
-    .tp-sc-date{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1rem;color:var(--ink2);font-weight:600;white-space:nowrap}
-    .tp-sc-days{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;font-weight:700;color:var(--terra);display:block;margin-top:2px;text-align:right}
-    
-    /* ── FESTIVAL CALENDAR ── */
+    .tp-sc-to{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.22rem;font-weight:700;flex:1;color:var(--sky)}
+    .tp-sc-date{font-family:"DM Mono",monospace;font-size:.92rem;color:var(--ink2);font-weight:600;white-space:nowrap}
+    .tp-sc-days{font-family:"DM Sans",sans-serif;font-size:.82rem;font-weight:700;color:var(--terra);display:block;margin-top:2px;text-align:right}
+
+    /* FESTIVAL CALENDAR */
     .tp-fest-cal-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
     @media(max-width:640px){.tp-fest-cal-grid{grid-template-columns:1fr}}
-    .tp-cal-head{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.5rem;color:var(--ink2);border-bottom:2px solid var(--rule);padding-bottom:11px;margin-bottom:16px;font-weight:400}
-    .tp-cal-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--rule)}
+    .tp-cal-head{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.4rem;color:var(--sky);border-bottom:2px solid var(--sky-pale);padding-bottom:11px;margin-bottom:14px;font-weight:600}
+    .tp-cal-row{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid var(--rule)}
     .tp-cal-row:last-child{border-bottom:none}
-    .tp-cal-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.1rem;color:var(--ink);flex:1;line-height:1.4}
-    /* FIX: larger, darker, bolder date text in calendar */
-    .tp-cal-date{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1rem;color:var(--ink2);white-space:nowrap;text-align:right;font-weight:700}
-    .tp-cal-days{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;font-weight:700;color:var(--terra);display:block;margin-top:2px}
-    
-    /* ── FOOTER (cream, not dark) ── */
-    .tp-footer{
-    display:flex;gap:0;
-    background:var(--cream2);
-    border:1.5px solid rgba(168,120,40,.22);
-    border-radius:12px;
-    margin-top:40px;
-    overflow:hidden;
-    }
-    .tp-fi{flex:1;min-width:170px;padding:22px 26px}
-    .tp-fi-lbl{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.9rem;color:var(--ink4);margin-bottom:6px;letter-spacing:.3px}
-    .tp-fi-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.6rem;color:var(--ink2);font-weight:400}
-    .tp-fi-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:var(--ink3);margin-top:3px}
-    .tp-fi-div{width:1.5px;background:var(--rule);align-self:stretch;flex-shrink:0}
-    
+    .tp-cal-name{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.08rem;color:var(--ink);flex:1;line-height:1.4}
+    .tp-cal-date{font-family:"DM Mono",monospace;font-size:.92rem;color:var(--ink2);white-space:nowrap;text-align:right;font-weight:700}
+    .tp-cal-days{font-family:"DM Sans",sans-serif;font-size:.8rem;font-weight:700;color:var(--terra);display:block;margin-top:2px}
+
+    /* FOOTER */
+    .tp-footer{display:flex;gap:0;background:linear-gradient(135deg,#173f60,#2e79a8);border:none;border-radius:18px;margin-top:38px;overflow:hidden;box-shadow:0 12px 34px -14px rgba(16,55,95,.5)}
+    .tp-fi{flex:1;min-width:170px;padding:22px 26px;border-right:1px solid rgba(255,255,255,.12)}
+    .tp-fi:last-child{border-right:none}
+    .tp-fi-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;font-weight:800;color:rgba(255,255,255,.58);margin-bottom:7px}
+    .tp-fi-hi{font-family:"Tiro Devanagari Sanskrit",serif;font-size:1.55rem;color:#fff;font-weight:400}
+    .tp-fi-sub{font-family:"Tiro Devanagari Sanskrit",serif;font-size:.95rem;color:#bcdcf0;margin-top:3px}
+    .tp-fi-div{display:none}
+
     /* Animations */
     @keyframes tpFade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
     .ta{animation:tpFade .5s ease both}
     .ta1{animation-delay:.07s}.ta2{animation-delay:.14s}
     .ta3{animation-delay:.21s}.ta4{animation-delay:.28s}.ta5{animation-delay:.35s}
-    
+
     @media(max-width:700px){
-    .tp{padding:18px 12px 36px}
-    .tp-date-num{font-size:4rem}
+    .tp-date-num{font-size:4.2rem}
     .tp-vara-name{font-size:2.4rem}
-    .tp-planet-grid{grid-template-columns:repeat(3,1fr)}
+    .tp-planet-grid{grid-template-columns:repeat(2,1fr)}
     }
     ';
         $h .= '</style>';
@@ -754,7 +727,7 @@ namespace App\Features\Festival;
         $h .= '<div class="ta ta1" style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:28px">';
 
         // Sun arc card
-        $h .= '<div style="flex:2;min-width:240px;background:#fffdf6;border:1.5px solid var(--rule);border-radius:16px;padding:14px 20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+        $h .= '<div style="flex:2;min-width:240px;background:#fff;border:1px solid var(--rule);border-radius:16px;box-shadow:0 2px 14px rgba(20,60,100,.05);padding:14px 20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center">'
             . '<svg width="100%" height="96" viewBox="0 0 260 96" preserveAspectRatio="xMidYMid meet">'
             . '<defs><linearGradient id="tpSun" x1="0" y1="0" x2="1" y2="0">'
             . '<stop offset="0" stop-color="#e8902a"/><stop offset="0.5" stop-color="#f5c130"/><stop offset="1" stop-color="#e8902a"/>'
@@ -773,7 +746,7 @@ namespace App\Features\Festival;
             . '</div>';
 
         // Progress rings
-        $h .= '<div style="flex:3;min-width:300px;background:#fffdf6;border:1.5px solid var(--rule);border-radius:16px;padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-around">'
+        $h .= '<div style="flex:3;min-width:300px;background:#fff;border:1px solid var(--rule);border-radius:16px;box-shadow:0 2px 14px rgba(20,60,100,.05);padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-around">'
             . $ring((float)($tithi['prog'] ?? 0), '#c48a2f', 'तिथि', ($tithi['num'] ?? '') . '/15')
             . $ring((float)($nak['prog']   ?? 0), '#1d6aaa', 'नक्षत्र', ($nak['num'] ?? '') . '/27')
             . $ring((float)($yoga['prog']  ?? 0), '#2d7a3a', 'योग', ($yoga['num'] ?? '') . '/27')
