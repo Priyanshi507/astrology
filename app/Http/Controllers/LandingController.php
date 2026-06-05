@@ -61,13 +61,22 @@ class LandingController extends Controller
         $hr     = (int)floor($riseHr);
         $mn     = (int)round(($riseHr - $hr) * 60);
 
+        // Panchanga (tithi / nakshatra / yoga …) uses the conventional sunrise reference.
         $result     = AstroCalculator::calculate($yr, $mo, $dy, $hr, $mn, self::UTC, self::LAT, self::LON);
-        $ayan       = $result['ayan'];
-        $planets    = $result['planets'];
         $pancha     = $result['pancha'];
         $tk         = $result['tk'];
-        $ascSignIdx = $result['ascSignIdx'];
-        $ascSider   = $result['ascSider'];
+
+        // Planet positions, ascendant & charts use the date's ACTUAL clock time, so
+        // the degrees shown here exactly match the calculator page when the same
+        // date/time/location is entered there. (date-only → noon).
+        $clkHr = (int)$date->format('G');
+        $clkMn = (int)$date->format('i');
+        if ($clkHr === 0 && $clkMn === 0) { $clkHr = 12; }
+        $pResult    = AstroCalculator::calculate($yr, $mo, $dy, $clkHr, $clkMn, self::UTC, self::LAT, self::LON);
+        $ayan       = $pResult['ayan'];
+        $planets    = $pResult['planets'];
+        $ascSignIdx = $pResult['ascSignIdx'];
+        $ascSider   = $pResult['ascSider'];
 
         $vSigns = AstroCalculator::getVedicSigns();
         $naks   = AstroCalculator::getNakshatras();
