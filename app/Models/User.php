@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +22,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'birth_date',
+        'birth_time',
+        'birth_city_name',
+        'birth_latitude',
+        'birth_longitude',
+        'birth_utc_offset',
+        'birth_timezone_identifier',
     ];
 
     /**
@@ -42,7 +50,18 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'birth_date'        => 'date',
         ];
+    }
+
+    public function natalCharts(): HasMany
+    {
+        return $this->hasMany(NatalChart::class);
+    }
+
+    public function primaryChart(): HasMany
+    {
+        return $this->hasMany(NatalChart::class)->where('is_primary_chart', true);
     }
 }

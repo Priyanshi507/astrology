@@ -1,10 +1,13 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Features\Planetary\AstroCalculator;
-use App\Features\Festival\HinduFestivalCalculator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use App\Services\Planetary\AstroCalculator;
+use App\Services\Festival\HinduFestivalCalculator;
 
 class LandingController extends Controller
 {
@@ -13,40 +16,57 @@ class LandingController extends Controller
     private const UTC = 5.5;
     private const TZ  = 'Asia/Kolkata';
 
-    private const CHOGHADIYA_DAY = [
-        0 => ['Udveg','Chal','Labh','Amrit','Kaal','Shubh','Rog','Udveg'],
-        1 => ['Amrit','Kaal','Shubh','Rog','Udveg','Chal','Labh','Amrit'],
-        2 => ['Rog','Udveg','Chal','Labh','Amrit','Kaal','Shubh','Rog'],
-        3 => ['Labh','Amrit','Kaal','Shubh','Rog','Udveg','Chal','Labh'],
-        4 => ['Shubh','Rog','Udveg','Chal','Labh','Amrit','Kaal','Shubh'],
-        5 => ['Chal','Labh','Amrit','Kaal','Shubh','Rog','Udveg','Chal'],
-        6 => ['Kaal','Shubh','Rog','Udveg','Chal','Labh','Amrit','Kaal'],
-    ];
-
     public function index()
     {
-        $now  = new \DateTime('now', new \DateTimeZone(self::TZ));
-        $data = $this->buildForDate($now);
+        $now     = new \DateTime('now', new \DateTimeZone(self::TZ));
+        $dateStr = $now->format('Y-m-d');
 
-        $yr       = (int)$now->format('Y');
-        $today    = $now->format('Y-m-d');
-        $festData = HinduFestivalCalculator::calculateYear($yr, self::LAT, self::LON, self::UTC);
-        $upcoming = [];
-        foreach (($festData['festivals'] ?? []) as $f) {
-            if (($f['date'] ?? '') >= $today && count($upcoming) < 10) {
-                $upcoming[] = $f;
+        // Reuse the same 30-day cache as panchangaData() so the initial page
+        // load is instant on repeated visits and shares cache with AJAX calls.
+        $data = Cache::remember("panchanga_day_{$dateStr}", 86400 * 30, function () use ($now, $dateStr) {
+            $built    = $this->buildForDate($now);
+            $allFests = $this->yearFestivals((int)$now->format('Y'));
+            $upcoming = [];
+            foreach ($allFests as $f) {
+                if (($f['date'] ?? '') >= $dateStr && count($upcoming) < 40) {
+                    $upcoming[] = $f;
+                }
             }
-        }
+            $built['upcoming'] = $upcoming;
+            return $built;
+        });
 
-        return view('landing', array_merge($data, ['upcoming' => $upcoming]));
+        return view('landing', $data);
     }
 
     public function panchangaData(Request $request)
     {
         $request->validate(['date' => 'nullable|date_format:Y-m-d']);
         $dateStr = $request->input('date', (new \DateTime('now', new \DateTimeZone(self::TZ)))->format('Y-m-d'));
-        $date    = \DateTime::createFromFormat('Y-m-d', $dateStr, new \DateTimeZone(self::TZ));
-        return response()->json($this->buildForDate($date));
+
+        $data = Cache::remember("panchanga_day_{$dateStr}", 86400 * 30, function () use ($dateStr) {
+            $date     = \DateTime::createFromFormat('Y-m-d', $dateStr, new \DateTimeZone(self::TZ));
+            $built    = $this->buildForDate($date);
+            $allFests = $this->yearFestivals((int)$date->format('Y'));
+            $upcoming = [];
+            foreach ($allFests as $f) {
+                if (($f['date'] ?? '') >= $dateStr && count($upcoming) < 40) {
+                    $upcoming[] = $f;
+                }
+            }
+            $built['upcoming'] = $upcoming;
+            return $built;
+        });
+
+        return response()->json($data);
+    }
+
+    private function yearFestivals(int $yr): array
+    {
+        return Cache::remember("landing_festivals_{$yr}", 86400, function () use ($yr) {
+            $festData = HinduFestivalCalculator::calculateYear($yr, self::LAT, self::LON, self::UTC);
+            return $festData['festivals'] ?? [];
+        });
     }
 
     private function buildForDate(\DateTime $date): array
@@ -118,21 +138,26 @@ class LandingController extends Controller
             ? substr(AstroCalculator::decToHMS($ss['set']),  0, 5) : '—';
 
         // Choghadiya (8 day periods sunrise→sunset)
-        $varaIdx  = $pancha['varaIdx'];
-        $periods  = self::CHOGHADIYA_DAY[$varaIdx] ?? self::CHOGHADIYA_DAY[0];
+        $varaIdx   = $pancha['varaIdx'];
         $periodLen = ($setHr - $riseHr) / 8;
-        $choQual  = ['Amrit'=>'best','Shubh'=>'good','Labh'=>'good',
-                     'Chal'=>'neutral','Udveg'=>'bad','Kaal'=>'bad','Rog'=>'bad'];
-        $choHi    = ['Amrit'=>'अमृत','Shubh'=>'शुभ','Labh'=>'लाभ',
-                     'Chal'=>'चल','Udveg'=>'उद्वेग','Kaal'=>'काल','Rog'=>'रोग'];
+        $periods   = DB::table('choghadiya_sequences as cs')
+            ->join('weekdays as w', 'cs.weekday_id', '=', 'w.id')
+            ->join('choghadiya_types as ct', 'cs.choghadiya_type_id', '=', 'ct.id')
+            ->where('w.dow_index', $varaIdx)
+            ->where('cs.is_night', false)
+            ->orderBy('cs.id')
+            ->pluck('ct.name')
+            ->toArray();
+        $choQual = ['Amrit'=>'best', 'Shubha'=>'good', 'Labha'=>'good',
+                    'Char'=>'neutral', 'Udveg'=>'bad', 'Kaal'=>'bad', 'Rog'=>'bad'];
         $choghadiya = [];
         for ($i = 0; $i < 8; $i++) {
             $sH = $riseHr + $i * $periodLen;
             $eH = $riseHr + ($i + 1) * $periodLen;
-            $nm = $periods[$i];
+            $nm = $periods[$i] ?? '';
             $choghadiya[] = [
                 'name'    => $nm,
-                'nameHi'  => $choHi[$nm] ?? $nm,
+                'nameHi'  => $nm,
                 'quality' => $choQual[$nm] ?? 'neutral',
                 'start'   => substr(AstroCalculator::decToHMS($sH), 0, 5),
                 'end'     => substr(AstroCalculator::decToHMS($eH), 0, 5),

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -18,6 +15,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->date('birth_date')->nullable();
+            $table->time('birth_time')->nullable();
+            $table->string('birth_city_name', 120)->nullable();
+            $table->decimal('birth_latitude', 9, 6)->nullable();
+            $table->decimal('birth_longitude', 9, 6)->nullable();
+            $table->decimal('birth_utc_offset', 5, 2)->nullable();
+            $table->string('birth_timezone_identifier', 60)->nullable();
             $table->timestamps();
         });
 
@@ -37,13 +41,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
